@@ -1,0 +1,359 @@
+# Gestion des parties
+
+from PIL import Image, ImageTk, ImageFont, ImageDraw
+import random as r
+from functools import reduce
+
+class Card:
+    def __init__(self, number, family):
+        self.number = number
+        self.family = family
+
+    def generate_texture(self, rotation = 0, face = True):
+        if face:
+            if self.family == 0: # Pique
+                self.base = Image.open("card_face_pique.png")
+            elif self.family == 1: # Trèfle
+                self.base = Image.open("card_face_trefle.png")
+            elif self.family == 2: # Carreaux
+                self.base = Image.open("card_face_carreaux.png")
+            elif self.family == 3: # Coeur
+                self.base = Image.open("card_face_coeur.png")
+            else:
+                return
+            
+            self.font = ImageFont.truetype("LemonMilkbold.otf", 20)
+            
+            draw = ImageDraw.Draw(self.base)
+            draw.text((18,5), self.number_str(), fill=(0,0,0,255), font=self.font)
+        else:
+            self.base = Image.open("card_back.png")
+        
+        self.edited = self.base.resize((100, 140)).rotate(rotation, expand=1)
+        self.tk_image = ImageTk.PhotoImage(self.edited)
+
+    def full_cards_list():
+        ll = []
+        for family in range(0, 4):
+            for value in range(1, 14):
+                ll.append(Card(value, family))
+        return ll
+
+    def number_str(self):
+        if self.number == 11:
+            return "J"
+        elif self.number == 12:
+            return "Q"
+        elif self.number == 13:
+            return "K"
+        elif self.number == 1:
+            return "A"
+        elif self.number > 13 or self.number < 1:
+            return "?"
+        else:
+            return str(self.number)
+    
+    def __str__(self):
+        family = self.family
+        if   family == 0: # pique
+            family = "\u2660"
+        elif family == 1: # trèfle
+            family = "\u2663"
+        elif family == 2: # carreaux
+            family = "\u2666"
+        elif family == 3: # coeur
+            family = "\u2665"
+
+        return self.number_str() + str(family)
+
+class Player:
+    startingMoney = 1000
+    names = ["Jackouille la fripouille", "___xXx__daRk_KikouLolDu92__xXx___", "Pigeon", "Coq", "Mouton", "Alban", "Maxence", "Megaman", "Yvette", "Verrue puante", "Asticot velu"]
+    def __init__(self):
+        self.money = self.startingMoney
+        self.name = self.randomName()
+        self.hand = []
+
+    def __str__(self):
+        return (self.getName() + " : " +
+                " | Card 1 : " + str(self.hand[0]) +
+                " | Card 2 : " + str(self.hand[1]) +
+                " | Money : " + str(self.money))
+            
+    def randomName(self): #string
+        r.shuffle(self.names)
+        return self.names[0]
+
+    def getName(self): #string
+        return self.name
+
+    def newCard(self, card):
+        self.hand.append(card)
+
+    def getMoney(self): #int
+        return self.money
+
+    def moneyChange(self, amount):
+        self.money += amount
+        
+    def getHand(self): #list of cards
+        return self.hand
+      
+class Partie:
+    minimalBet = 0
+    players = []
+    cardsInGame = []
+    cardsLeft = []
+    
+    def __init__(self, nbPlayers = 2, minimalBet = 10):
+        self.cardsLeft = Card.full_cards_list()
+        r.shuffle(self.cardsLeft)
+
+        self.minimalBet = minimalBet
+        
+        for i in range(0, nbPlayers):
+            self.players.append(Player()) #Generé dans cette classe
+            
+
+    def __str__(self):
+        ttr = "Players in the game : \n"
+        for player in self.players :
+            ttr += (str(player) + "\n")
+        ttr += "Cards in game : "
+        for card in self.cardsInGame :
+            ttr += (str(card) + " | ")
+        return ttr
+
+    def getNumberOfCardsInGame(self):
+        return len(self.cardsInGame)
+
+    def start(self):
+        self.draw(False, 2, 0) #Draw Player 1 Cards
+        self.draw(False, 2, 1) #Draw Player 2 Cards
+        self.draw(True, 5)     #Draw Game Cards
+
+    def bet(self, betAmount, playerIndex):
+        self.players[playerIndex].moneyChange(-betAmount)
+
+    def draw(self, isForGame, amount = 1, playerIndex = 0):
+        if(len(self.cardsLeft) <= 0):
+            return system.write("Error : The deck isn't supposed to be empty !", "ERROR")
+        else :
+            for i in range(0, amount):
+                if(isForGame == False) :
+                    self.players[playerIndex].newCard(self.cardsLeft.pop(0))
+                        #print(self.players[playerIndex].hand[i].number, self.players[playerIndex].hand[i].family)
+                elif(isForGame == True) :
+                    self.cardsInGame.append(self.cardsLeft[0])
+                    self.cardsLeft.pop(0)
+                    
+    def compare(self):
+        if(self.check(0)[0] > self.check(1)[0]):
+            return 1
+        elif(self.check(0)[0] < self.check(1)[0]):
+            return 2
+        elif(self.check(0)[1].number > self.check(1)[1].number):
+             return 1
+        elif(self.check(0)[1].number < self.check(1)[1].number):
+            return 2
+        else:
+            return -1
+    
+    def check(self, playerIndex):
+        cardsToCheck = self.players[playerIndex].getHand() + self.cardsInGame
+        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#
+            return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
+        if self.checkQuinteFlush(cardsToCheck)[0]:#
+            return (9,self.checkQuinteFlush(cardsToCheck)[1])
+        if self.checkCarre(cardsToCheck)[0]:#
+            return (8,self.checkCarre(cardsToCheck)[1])
+        if self.checkFull(cardsToCheck)[0]:#
+            return (7,self.checkFull(cardsToCheck)[1])
+        if self.checkCouleur(cardsToCheck)[0]:#
+            n = reduce(lambda a,b: a+b, self.checkSuite(cardsToCheck)[1])
+            c = Card(n,1)
+            return (6,c)
+        if self.checkSuite(cardsToCheck)[0]:#
+            n = reduce(lambda a,b: a+b, self.checkSuite(cardsToCheck)[1])
+            c = Card(n,1)
+            return (5,c)
+        if self.checkBrelan(cardsToCheck)[0]:#
+            return (4,self.checkBrelan(cardsToCheck)[1])
+        if self.checkDoublePaire(cardsToCheck)[0]:#
+            return (3,self.checkDoublePaire(cardsToCheck)[1])
+        if self.checkPaire(cardsToCheck)[0]:#
+            return (2,self.checkPaire(cardsToCheck)[1])
+        highestN = 0
+        for n in cardsToCheck:
+            highestN = max(n.number, highestN)
+        return (1, Card(highestN,1))#
+    
+    def checkQuinteFlushRoyale(self, cards):
+        if(self.checkQuinteFlush(cards)[0]):
+            values = self.checkQuinteFlush()[1].sort()
+            if(values[0] == "J"):
+                return (True, Card(0,1))
+            else:
+                return (False, None)
+        else:
+            return (False, None)
+    
+    def checkQuinteFlush(self, cards):
+        couleurs = [c.family for c in cards]    
+
+        if(self.checkCouleur(cards) and self.checkSuite(cards)):
+            mostFrequentFamily = self.mostFrequent(couleurs)
+            count = 0
+            for color in couleurs:
+                if color == mostFrequentFamily:
+                    count += 1
+                else:
+                    couleurs.pop(color)
+            if count >= 5:
+                values = set([c.number for c in couleurs])
+                n=0
+                for i in range(len(values)-1):
+                    if(values[i+1] - values[i] == 1):
+                       n += 1
+                    else:
+                        n = 0
+                if n >= 5:
+                    return (True,values)
+                else :
+                    return (False, None)
+            else:
+                return (False, None)
+        else:
+            return (False, None)
+        
+    def checkCarre(self, cards):
+        values = [c.number for c in cards]
+        mostFrequentValue = self.mostFrequent(values)
+        count = 0
+        for n in values:
+            if n == mostFrequentValue:
+                count += 1
+        if count == 4:
+            return (True, Card(mostFrequentValue,1))
+        else:
+            return (False, None)
+    
+    def checkFull(self, cards):
+        cardsToPop = []
+        values = [c.number for c in cards]
+        mostFrequentValue = self.mostFrequent(values)
+        count = 0
+        for i in range(0, len(values)-1):
+            if values[i] == mostFrequentValue:
+                count += 1
+                cardsToPop.append(i)
+        indexes = [i for i in cardsToPop]
+        for index in sorted(indexes, reverse=True):
+            values.pop(index)                                              
+        cardsToPop = []    
+        secondMostFrequentValue = self.mostFrequent(values)
+        count2 = 0
+        for i in range(0, len(values)-1):
+            if values[i] == mostFrequentValue:
+                count += 1
+                cardsToPop.append(i)
+        indexes = [i for i in cardsToPop]
+        for index in sorted(indexes, reverse=True):
+            values.pop(index)       
+        if count == 3 and count2 == 2:
+            return (True, Card(mostFrequentValue + secondMostFrequentValue,1))
+        else:
+            return (False, None)
+        
+    def checkCouleur(self, cards):
+        couleurs = [c.family for c in cards]
+        mostFrequentFamily = self.mostFrequent(couleurs)
+        count = 0
+        for n in couleurs:
+            if n == mostFrequentFamily:
+                count += 1
+        if count >= 5:
+          flushCards = []
+          for card in cards:
+              if card.family == mostFrequentFamily:
+                  flushCards.append(card.number)
+          flushCards.sort()
+          flushCards = flushCards[::-1][:5]
+          return (True, flushCards)
+        else:
+          return (False, None)
+        
+    def checkSuite(self, cards):
+        n=0
+        values = set([int(c.number) for c in cards])
+        values = list(values)
+        for i in range(len(values)-1):
+            if(values[i+1] - values[i] == 1):
+               n += 1
+            else:
+                n = 0
+        if n >= 5:
+            return (True, values[:5])
+        else :
+            return (False, None)
+    
+    def checkBrelan(self, cards):
+        values = [c.number for c in cards]
+        mostFrequentValue = self.mostFrequent(values)
+        count = 0
+        for n in values:
+            if n == mostFrequentValue:
+                count += 1
+        if count == 3:
+            return (True, Card(mostFrequentValue,1))
+        else:
+            return (False, None)
+    
+    def checkDoublePaire(self, cards):
+        cardsToPop = []
+        values = [c.number for c in cards]
+        mostFrequentValue = self.mostFrequent(values)
+        count = 0
+        for i in range(0, len(values)-1):
+            if values[i] == mostFrequentValue:
+                count += 1
+                cardsToPop.append(i)
+        indexes = [i for i in cardsToPop]
+        for index in sorted(indexes, reverse=True):
+            values.pop(index)       
+        cardsToPop = []    
+        secondMostFrequentValue = self.mostFrequent(values)
+        count2 = 0
+        for i in range(0, len(values)-1):
+            if values[i] == mostFrequentValue:
+                count += 1
+                cardsToPop.append(i)
+        indexes = [i for i in cardsToPop]
+        for index in sorted(indexes, reverse=True):
+            values.pop(index)       
+        if count == 2 and count2 == 2:
+            return (True, Card(mostFrequentValue + secondMostFrequentValue, 1))
+        else:
+            return (False, None)
+    
+    def checkPaire(self, cards):
+        values = [c.number for c in cards]
+        mostFrequentValue = self.mostFrequent(values)
+        count = 0
+        for n in values:
+            if n == mostFrequentValue:
+                count += 1
+        if count == 2:
+            return (True, Card(mostFrequentValue,1))
+        else:
+            return False, (None)
+
+    def mostFrequent(self, List): 
+        counter = 0
+        num = List[0]       
+        for i in List: 
+            curr_frequency = List.count(i) 
+            if(curr_frequency> counter): 
+                counter = curr_frequency 
+                num = i 
+        return num 
