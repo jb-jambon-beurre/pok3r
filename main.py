@@ -127,7 +127,7 @@ class Graphics:
         if player_n == 2:
             r1, r2 = 160, 140
             x1, y1, x2, y2 = 920, 130, 800, 70
-            #face = False
+            face = False
         
         if self.finished:
             face = True
