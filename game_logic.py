@@ -35,7 +35,7 @@ class Card:
     def full_cards_list():
         ll = []
         for family in range(0, 4):
-            for value in range(1, 14):
+            for value in range(2, 15):
                 ll.append(Card(value, family))
         return ll
 
@@ -46,7 +46,7 @@ class Card:
             return "Q"
         elif self.number == 13:
             return "K"
-        elif self.number == 1:
+        elif self.number == 14:
             return "A"
         elif self.number > 13 or self.number < 1:
             return "?"
@@ -149,44 +149,65 @@ class Partie:
                     
     def compare(self):
         if(self.check(0)[0] > self.check(1)[0]):
+            print("Victoire joueur 1 car meilleur type de main")
             return 1
         elif(self.check(0)[0] < self.check(1)[0]):
+            print("Victoire joueur 2 car meilleur type de main")
             return 2
         elif(self.check(0)[1].number > self.check(1)[1].number):
-             return 1
+            print("Victoire joueur 1 car meilleur main contre le même type de main")
+            return 1
         elif(self.check(0)[1].number < self.check(1)[1].number):
+            print("Victoire joueur 2 car meilleur main contre le même type de main")
             return 2
         else:
+            print("Egalité")
             return -1
+
+    def sort(self, cards):
+        c = sorted(cards, key=lambda card: card.number)
+        return c
     
     def check(self, playerIndex):
         cardsToCheck = self.players[playerIndex].getHand() + self.cardsInGame
+        playerIndex += 1
+        cardsToCheck = self.sort(cardsToCheck)
         if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#
+            print("Quinte Flush Royale" + " " + str(playerIndex))
             return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
-        if self.checkQuinteFlush(cardsToCheck)[0]:#
+        elif self.checkQuinteFlush(cardsToCheck)[0]:#
+            print("Quinte Flush" + " " + str(playerIndex))
             return (9,self.checkQuinteFlush(cardsToCheck)[1])
-        if self.checkCarre(cardsToCheck)[0]:#
+        elif self.checkCarre(cardsToCheck)[0]:#
+            print("Carre" + " " + str(playerIndex))
             return (8,self.checkCarre(cardsToCheck)[1])
-        if self.checkFull(cardsToCheck)[0]:#
+        elif self.checkFull(cardsToCheck)[0]:#
+            print("Full" + " " + str(playerIndex))
             return (7,self.checkFull(cardsToCheck)[1])
-        if self.checkCouleur(cardsToCheck)[0]:#
+        elif self.checkCouleur(cardsToCheck)[0]:#
+            print("Couleur" + " " + str(playerIndex))
             n = reduce(lambda a,b: a+b, self.checkCouleur(cardsToCheck)[1])
             c = Card(n,1)
             return (6,c)
-        if self.checkSuite(cardsToCheck)[0]:#
+        elif self.checkSuite(cardsToCheck)[0]:#
+            print("Suite" + " " + str(playerIndex))
             n = reduce(lambda a,b: a+b, self.checkSuite(cardsToCheck)[1])
             c = Card(n,1)
             return (5,c)
-        if self.checkBrelan(cardsToCheck)[0]:#
+        elif self.checkBrelan(cardsToCheck)[0]:#
+            print("Brelan" + " " + str(playerIndex))
             return (4,self.checkBrelan(cardsToCheck)[1])
-        if self.checkDoublePaire(cardsToCheck)[0]:#
+        elif self.checkDoublePaire(cardsToCheck)[0]:#BUG DOUBLE PAIRE
+            print("Double Paire" + " " + str(playerIndex)) 
             return (3,self.checkDoublePaire(cardsToCheck)[1])
-        if self.checkPaire(cardsToCheck)[0]:#
+        elif self.checkPaire(cardsToCheck)[0]:#POTENTIEL BUG PAIRE
+            print("Paire" + " " + str(playerIndex)) 
             return (2,self.checkPaire(cardsToCheck)[1])
-        highestN = 0
-        for n in cardsToCheck:
-            highestN = max(n.number, highestN)
-        return (1, Card(highestN,1))#
+        else:
+            #print("Carte la plus haute" + " " + str(playerIndex))
+            highestN = reduce(max, [card.number for card in cardsToCheck])
+            print("Highest N", highestN, playerIndex)
+            return (1, Card(highestN,1))#BUG HIGHEST CARD
     
     def checkQuinteFlushRoyale(self, cards):
         if(self.checkQuinteFlush(cards)[0]):
@@ -239,20 +260,12 @@ class Partie:
             return (False, None)
     
     def checkFull(self, cards):
-        cardsToPop = []
         values = [c.number for c in cards]
+        ###
+        cardsToPop = []
         mostFrequentValue = self.mostFrequent(values)
         count = 0
-        for i in range(0, len(values)-1):
-            if values[i] == mostFrequentValue:
-                count += 1
-                cardsToPop.append(i)
-        indexes = [i for i in cardsToPop]
-        for index in sorted(indexes, reverse=True):
-            values.pop(index)                                              
-        cardsToPop = []    
-        secondMostFrequentValue = self.mostFrequent(values)
-        count2 = 0
+
         for i in range(0, len(values)-1):
             if values[i] == mostFrequentValue:
                 count += 1
@@ -260,8 +273,16 @@ class Partie:
         indexes = [i for i in cardsToPop]
         for index in sorted(indexes, reverse=True):
             values.pop(index)       
-        if count == 3 and count2 == 2:
-            return (True, Card(mostFrequentValue + secondMostFrequentValue,1))
+        ###
+        secondMostFrequentValue = self.mostFrequent(values)
+        count2 = 0
+
+        for n in values:
+            if n == secondMostFrequentValue:
+                count2 += 1
+        ###    
+        if count == 2 and count2 == 3:
+            return (True, Card(mostFrequentValue + secondMostFrequentValue, 1))
         else:
             return (False, None)
         
@@ -310,10 +331,12 @@ class Partie:
             return (False, None)
     
     def checkDoublePaire(self, cards):
-        cardsToPop = []
         values = [c.number for c in cards]
+        ###
+        cardsToPop = []
         mostFrequentValue = self.mostFrequent(values)
         count = 0
+
         for i in range(0, len(values)-1):
             if values[i] == mostFrequentValue:
                 count += 1
@@ -321,16 +344,14 @@ class Partie:
         indexes = [i for i in cardsToPop]
         for index in sorted(indexes, reverse=True):
             values.pop(index)       
-        cardsToPop = []    
+        ###
         secondMostFrequentValue = self.mostFrequent(values)
         count2 = 0
-        for i in range(0, len(values)-1):
-            if values[i] == mostFrequentValue:
-                count += 1
-                cardsToPop.append(i)
-        indexes = [i for i in cardsToPop]
-        for index in sorted(indexes, reverse=True):
-            values.pop(index)       
+
+        for n in values:
+            if n == secondMostFrequentValue:
+                count2 += 1
+        ###    
         if count == 2 and count2 == 2:
             return (True, Card(mostFrequentValue + secondMostFrequentValue, 1))
         else:
@@ -356,4 +377,4 @@ class Partie:
             if(curr_frequency> counter): 
                 counter = curr_frequency 
                 num = i 
-        return num
+        return num 
