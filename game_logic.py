@@ -130,7 +130,7 @@ class Partie:
     def start(self):
         self.draw(False, 2, 0) #Draw Player 1 Cards
         self.draw(False, 2, 1) #Draw Player 2 Cards
-        self.draw(True, 5)     #Draw Game Cards
+        self.draw(True, 3)     #Draw Game Cards
 
     def bet(self, betAmount, playerIndex):
         self.players[playerIndex].moneyChange(-betAmount)
@@ -170,7 +170,7 @@ class Partie:
         if self.checkFull(cardsToCheck)[0]:#
             return (7,self.checkFull(cardsToCheck)[1])
         if self.checkCouleur(cardsToCheck)[0]:#
-            n = reduce(lambda a,b: a+b, self.checkSuite(cardsToCheck)[1])
+            n = reduce(lambda a,b: a+b, self.checkCouleur(cardsToCheck)[1])
             c = Card(n,1)
             return (6,c)
         if self.checkSuite(cardsToCheck)[0]:#
@@ -356,4 +356,4 @@ class Partie:
             if(curr_frequency> counter): 
                 counter = curr_frequency 
                 num = i 
-        return num 
+        return num
