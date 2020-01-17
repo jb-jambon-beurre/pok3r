@@ -169,7 +169,7 @@ class Partie:
         ps = 0
         values = [c.number for c in cards]
         for c in values:
-            for i in range(14):
+            for i in range(2, 15):
                 j = 0
                 if c == i:
                     j+=1
