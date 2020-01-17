@@ -130,7 +130,7 @@ class Partie:
     def start(self):
         self.draw(False, 2, 0) #Draw Player 1 Cards
         self.draw(False, 2, 1) #Draw Player 2 Cards
-        self.draw(True, 3)     #Draw Game Cards
+        self.draw(True, (3))     #Draw Game Cards
 
     def bet(self, betAmount, playerIndex):
         self.players[playerIndex].moneyChange(-betAmount)
@@ -210,10 +210,10 @@ class Partie:
         elif self.checkBrelan(cardsToCheck)[0]:#
             print("Brelan" + " " + str(playerIndex))
             return (4,self.checkBrelan(cardsToCheck)[1])
-        elif self.checkDoublePaire(cardsToCheck)[0]:#BUG DOUBLE PAIRE
+        elif self.checkDoublePaire(cardsToCheck)[0]:
             print("Double Paire" + " " + str(playerIndex)) 
             return (3,self.checkDoublePaire(cardsToCheck)[1])
-        elif self.checkPaire(cardsToCheck)[0]:#POTENTIEL BUG PAIRE
+        elif self.checkPaire(cardsToCheck)[0]:#
             print("Paire" + " " + str(playerIndex)) 
             return (2,self.checkPaire(cardsToCheck)[1])
         else:
@@ -221,7 +221,7 @@ class Partie:
             highestN = 0
             for n in cardsToCheck:
                 highestN = max(n.number, highestN)
-            return (1, Card(highestN,1))#BUG HIGHEST CARD
+            return (1, Card(highestN,1))#
     
     def checkQuinteFlushRoyale(self, cards):
         if(self.checkQuinteFlush(cards)[0]):
@@ -274,29 +274,29 @@ class Partie:
             return (False, None)
     
     def checkFull(self, cards):
-        cardsToPop = []
         values = [c.number for c in cards]
+        ###
+        cardsToPop = []
         mostFrequentValue = self.mostFrequent(values)
         count = 0
+
         for i in range(0, len(values)-1):
             if values[i] == mostFrequentValue:
                 count += 1
                 cardsToPop.append(i)
         indexes = [i for i in cardsToPop]
         for index in sorted(indexes, reverse=True):
-            values.pop(index)                                              
-        cardsToPop = []    
+            values.pop(index)       
+        ###
         secondMostFrequentValue = self.mostFrequent(values)
         count2 = 0
-        for i in range(0, len(values)-1):
-            if values[i] == secondMostFrequentValue:
+
+        for n in values:
+            if n == secondMostFrequentValue:
                 count2 += 1
-                cardsToPop.append(i)
-        indexes = [i for i in cardsToPop]
-        for index in sorted(indexes, reverse=True):
-            values.pop(index)       
+        ###    
         if count == 3 and count2 == 2:
-            return (True, Card(mostFrequentValue + secondMostFrequentValue,1))
+            return (True, Card(mostFrequentValue + secondMostFrequentValue, 1))
         else:
             return (False, None)
         
