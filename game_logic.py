@@ -145,7 +145,7 @@ class Partie:
     def start(self):
         self.draw(False, 2, 0) #Draw Player 1 Cards
         self.draw(False, 2, 1) #Draw Player 2 Cards
-        self.draw(True, 3)     #Draw Game Cards
+        self.draw(True, (3))     #Draw Game Cards
 
     def bet(self, betAmount, playerIndex):
         self.players[playerIndex].moneyChange(-betAmount)
@@ -184,7 +184,7 @@ class Partie:
         ps = 0
         values = [c.number for c in cards]
         for c in values:
-            for i in range(14):
+            for i in range(2, 15):
                 j = 0
                 if c == i:
                     j+=1
@@ -290,29 +290,29 @@ class Partie:
             return (False, None)
     
     def checkFull(self, cards):
-        cardsToPop = []
         values = [c.number for c in cards]
+        ###
+        cardsToPop = []
         mostFrequentValue = self.mostFrequent(values)
         count = 0
+
         for i in range(0, len(values)-1):
             if values[i] == mostFrequentValue:
                 count += 1
                 cardsToPop.append(i)
         indexes = [i for i in cardsToPop]
         for index in sorted(indexes, reverse=True):
-            values.pop(index)                                              
-        cardsToPop = []    
+            values.pop(index)       
+        ###
         secondMostFrequentValue = self.mostFrequent(values)
         count2 = 0
-        for i in range(0, len(values)-1):
-            if values[i] == secondMostFrequentValue:
+
+        for n in values:
+            if n == secondMostFrequentValue:
                 count2 += 1
-                cardsToPop.append(i)
-        indexes = [i for i in cardsToPop]
-        for index in sorted(indexes, reverse=True):
-            values.pop(index)       
+        ###    
         if count == 3 and count2 == 2:
-            return (True, Card(mostFrequentValue + secondMostFrequentValue,1))
+            return (True, Card(mostFrequentValue + secondMostFrequentValue, 1))
         else:
             return (False, None)
         
