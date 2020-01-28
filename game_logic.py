@@ -118,8 +118,23 @@ class Partie:
     cardsLeft = []
 
     def __init__(self, nbPlayers = 2, minimalBet = 10):
-        self.cardsLeft = Card.full_cards_list()
-        r.shuffle(self.cardsLeft)
+        #self.cardsLeft = Card.full_cards_list()
+        #r.shuffle(self.cardsLeft)
+        self.cardsLeft = [
+            Card(2,3),  #Joueur 1
+            Card(3,3),
+
+            Card(14,2), #Joueur 2
+            Card(14,2),
+
+            Card(4,3),  #Tapis
+            Card(5,3),
+            Card(6,3),
+            Card(9,0),
+            Card(10,0),
+
+            Card(9,3)   #Placeholder
+        ]
 
         self.minimalBet = minimalBet
 
@@ -197,10 +212,10 @@ class Partie:
         cardsToCheck = self.players[playerIndex].getHand() + self.cardsInGame
         playerIndex += 1
         cardsToCheck = self.sort(cardsToCheck)
-        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#
+        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#Potentiel BUG
             print("Quinte Flush Royale" + " " + str(playerIndex))
             return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
-        elif self.checkQuinteFlush(cardsToCheck)[0]:#
+        elif self.checkQuinteFlush(cardsToCheck)[0]:#Potentiel BUG
             print("Quinte Flush" + " " + str(playerIndex))
             return (9,self.checkQuinteFlush(cardsToCheck)[1])
         elif self.checkCarre(cardsToCheck)[0]:#
@@ -222,7 +237,7 @@ class Partie:
         elif self.checkBrelan(cardsToCheck)[0]:#
             print("Brelan" + " " + str(playerIndex))
             return (4,self.checkBrelan(cardsToCheck)[1])
-        elif self.checkDoublePaire(cardsToCheck)[0]:
+        elif self.checkDoublePaire(cardsToCheck)[0]:#
             print("Double Paire" + " " + str(playerIndex))
             return (3,self.checkDoublePaire(cardsToCheck)[1])
         elif self.checkPaire(cardsToCheck)[0]:#
@@ -257,7 +272,8 @@ class Partie:
                 else:
                     couleurs.pop(color)
             if count >= 5:
-                values = set([c.number for c in couleurs])
+                values = set([c.number for c in cards])
+                values = list(values)
                 n=0
                 for i in range(len(values)-1):
                     if(values[i+1] - values[i] == 1):
@@ -332,13 +348,17 @@ class Partie:
 
     def checkSuite(self, cards):
         n=0
-        values = set([int(c.number) for c in cards])
+        last = 0
+        values = set([c.number for c in cards])
         values = list(values)
-        for i in range(len(values)-1):
-            if(values[i+1] - values[i] == 1):
-               n += 1
-            else:
-                n = 0
+        print(values)
+        for i in values:
+            if last != 0:
+                if i - last == 1:
+                    n += 1
+                last = i
+            else :
+                last = i
         if n >= 5:
             return (True, values[:5])
         else :
