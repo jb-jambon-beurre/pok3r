@@ -21,14 +21,14 @@ class Card:
                 self.base = Image.open("card_face_coeur.png")
             else:
                 return
-            
+
             self.font = ImageFont.truetype("LemonMilkbold.otf", 20)
-            
+
             draw = ImageDraw.Draw(self.base)
             draw.text((18,5), self.number_str(), fill=(0,0,0,255), font=self.font)
         else:
             self.base = Image.open("card_back.png")
-        
+
         self.edited = self.base.resize((100, 140)).rotate(rotation, expand=1)
         self.tk_image = ImageTk.PhotoImage(self.edited)
 
@@ -52,7 +52,7 @@ class Card:
             return "?"
         else:
             return str(self.number)
-    
+
     def __str__(self):
         family = self.family
         if   family == 0: # pique
@@ -65,6 +65,18 @@ class Card:
             family = "\u2665"
 
         return self.number_str() + str(family)
+
+class Coin:
+    def __init__(self):
+        self.base = Image.open("coin.png")
+        self.frame = 0
+
+    def generate_next_texture(self, moneyAmount = 0):
+        x = self.frame * 64
+        self.edited = self.base.crop((x, 0, 64, 64)).resize((100, 100))
+        self.tk_image = ImageTk.PhotoImage(self.edited)
+
+        self.frame = (self.frame + 1) % 46
 
 class Player:
     startingMoney = 1000
@@ -79,7 +91,7 @@ class Player:
                 " | Card 1 : " + str(self.hand[0]) +
                 " | Card 2 : " + str(self.hand[1]) +
                 " | Money : " + str(self.money))
-            
+
     def randomName(self): #string
         r.shuffle(self.names)
         return self.names[0]
@@ -95,25 +107,25 @@ class Player:
 
     def moneyChange(self, amount):
         self.money += amount
-        
+
     def getHand(self): #list of cards
         return self.hand
-      
+
 class Partie:
     minimalBet = 0
     players = []
     cardsInGame = []
     cardsLeft = []
-    
+
     def __init__(self, nbPlayers = 2, minimalBet = 10):
         self.cardsLeft = Card.full_cards_list()
         r.shuffle(self.cardsLeft)
 
         self.minimalBet = minimalBet
-        
+
         for i in range(0, nbPlayers):
             self.players.append(Player()) #Generé dans cette classe
-            
+
 
     def __str__(self):
         ttr = "Players in the game : \n"
@@ -146,7 +158,7 @@ class Partie:
                 elif(isForGame == True) :
                     self.cardsInGame.append(self.cardsLeft[0])
                     self.cardsLeft.pop(0)
-                    
+
     def compare(self):
         if(self.check(0)[0] > self.check(1)[0]):
             print("Victoire joueur 1 car meilleur type de main")
@@ -173,14 +185,14 @@ class Partie:
                 j = 0
                 if c == i:
                     j+=1
-                    
+
                 ps += 10**i * j
         return ps
 
     def sort(self, cards):
         c = sorted(cards, key=lambda card: card.number)
         return c
-    
+
     def check(self, playerIndex):
         cardsToCheck = self.players[playerIndex].getHand() + self.cardsInGame
         playerIndex += 1
@@ -211,10 +223,10 @@ class Partie:
             print("Brelan" + " " + str(playerIndex))
             return (4,self.checkBrelan(cardsToCheck)[1])
         elif self.checkDoublePaire(cardsToCheck)[0]:
-            print("Double Paire" + " " + str(playerIndex)) 
+            print("Double Paire" + " " + str(playerIndex))
             return (3,self.checkDoublePaire(cardsToCheck)[1])
         elif self.checkPaire(cardsToCheck)[0]:#
-            print("Paire" + " " + str(playerIndex)) 
+            print("Paire" + " " + str(playerIndex))
             return (2,self.checkPaire(cardsToCheck)[1])
         else:
             print("Carte la plus haute" + " " + str(playerIndex))
@@ -222,7 +234,7 @@ class Partie:
             for n in cardsToCheck:
                 highestN = max(n.number, highestN)
             return (1, Card(highestN,1))#
-    
+
     def checkQuinteFlushRoyale(self, cards):
         if(self.checkQuinteFlush(cards)[0]):
             values = self.checkQuinteFlush()[1].sort()
@@ -232,9 +244,9 @@ class Partie:
                 return (False, None)
         else:
             return (False, None)
-    
+
     def checkQuinteFlush(self, cards):
-        couleurs = [c.family for c in cards]    
+        couleurs = [c.family for c in cards]
 
         if(self.checkCouleur(cards) and self.checkSuite(cards)):
             mostFrequentFamily = self.mostFrequent(couleurs)
@@ -260,7 +272,7 @@ class Partie:
                 return (False, None)
         else:
             return (False, None)
-        
+
     def checkCarre(self, cards):
         values = [c.number for c in cards]
         mostFrequentValue = self.mostFrequent(values)
@@ -272,7 +284,7 @@ class Partie:
             return (True, Card(mostFrequentValue,1))
         else:
             return (False, None)
-    
+
     def checkFull(self, cards):
         values = [c.number for c in cards]
         ###
@@ -286,7 +298,7 @@ class Partie:
                 cardsToPop.append(i)
         indexes = [i for i in cardsToPop]
         for index in sorted(indexes, reverse=True):
-            values.pop(index)       
+            values.pop(index)
         ###
         secondMostFrequentValue = self.mostFrequent(values)
         count2 = 0
@@ -294,12 +306,12 @@ class Partie:
         for n in values:
             if n == secondMostFrequentValue:
                 count2 += 1
-        ###    
+        ###
         if count == 3 and count2 == 2:
             return (True, Card(mostFrequentValue + secondMostFrequentValue, 1))
         else:
             return (False, None)
-        
+
     def checkCouleur(self, cards):
         couleurs = [c.family for c in cards]
         mostFrequentFamily = self.mostFrequent(couleurs)
@@ -317,7 +329,7 @@ class Partie:
           return (True, flushCards)
         else:
           return (False, None)
-        
+
     def checkSuite(self, cards):
         n=0
         values = set([int(c.number) for c in cards])
@@ -331,7 +343,7 @@ class Partie:
             return (True, values[:5])
         else :
             return (False, None)
-    
+
     def checkBrelan(self, cards):
         values = [c.number for c in cards]
         mostFrequentValue = self.mostFrequent(values)
@@ -343,7 +355,7 @@ class Partie:
             return (True, Card(mostFrequentValue,1))
         else:
             return (False, None)
-    
+
     def checkDoublePaire(self, cards):
         values = [c.number for c in cards]
         ###
@@ -357,7 +369,7 @@ class Partie:
                 cardsToPop.append(i)
         indexes = [i for i in cardsToPop]
         for index in sorted(indexes, reverse=True):
-            values.pop(index)       
+            values.pop(index)
         ###
         secondMostFrequentValue = self.mostFrequent(values)
         count2 = 0
@@ -365,12 +377,12 @@ class Partie:
         for n in values:
             if n == secondMostFrequentValue:
                 count2 += 1
-        ###    
+        ###
         if count == 2 and count2 == 2:
             return (True, Card(mostFrequentValue + secondMostFrequentValue, 1))
         else:
             return (False, None)
-    
+
     def checkPaire(self, cards):
         values = [c.number for c in cards]
         mostFrequentValue = self.mostFrequent(values)
@@ -383,12 +395,12 @@ class Partie:
         else:
             return False, (None)
 
-    def mostFrequent(self, List): 
+    def mostFrequent(self, List):
         counter = 0
-        num = List[0]       
-        for i in List: 
-            curr_frequency = List.count(i) 
-            if(curr_frequency> counter): 
-                counter = curr_frequency 
-                num = i 
-        return num 
+        num = List[0]
+        for i in List:
+            curr_frequency = List.count(i)
+            if(curr_frequency> counter):
+                counter = curr_frequency
+                num = i
+        return num
