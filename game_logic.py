@@ -109,17 +109,17 @@ class Partie:
         #self.cardsLeft = Card.full_cards_list()
         #r.shuffle(self.cardsLeft)
         self.cardsLeft = [
-            Card(2,3),  #Joueur 1
-            Card(3,3),
+            Card(10,3),  #Joueur 1
+            Card(11,3),
             
-            Card(14,2), #Joueur 2
+            Card(14,1), #Joueur 2
             Card(14,2),
 
-            Card(4,3),  #Tapis
-            Card(5,3),
-            Card(6,3),
-            Card(9,0),
-            Card(10,0),
+            Card(12,3),  #Tapis
+            Card(8,3),
+            Card(9,3),
+            Card(5,0),
+            Card(2,0),
 
             Card(9,3)   #Placeholder
         ]
@@ -200,10 +200,10 @@ class Partie:
         cardsToCheck = self.players[playerIndex].getHand() + self.cardsInGame
         playerIndex += 1
         cardsToCheck = self.sort(cardsToCheck)
-        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#Potentiel BUG
-            print("Quinte Flush Royale" + " " + str(playerIndex))
-            return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
-        elif self.checkQuinteFlush(cardsToCheck)[0]:#Potentiel BUG
+        #if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#BUG
+         #   print("Quinte Flush Royale" + " " + str(playerIndex))
+          #  return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
+        if self.checkQuinteFlush(cardsToCheck)[0]:#BUG quinte flush
             print("Quinte Flush" + " " + str(playerIndex))
             return (9,self.checkQuinteFlush(cardsToCheck)[1])
         elif self.checkCarre(cardsToCheck)[0]:#
@@ -238,44 +238,48 @@ class Partie:
                 highestN = max(n.number, highestN)
             return (1, Card(highestN,1))#
     
-    def checkQuinteFlushRoyale(self, cards):
-        if(self.checkQuinteFlush(cards)[0]):
-            values = self.checkQuinteFlush()[1].sort()
-            if(values[0] == "J"):
-                return (True, Card(0,1))
-            else:
-                return (False, None)
-        else:
-            return (False, None)
+##    def checkQuinteFlushRoyale(self, cards):
+##        if(self.checkQuinteFlush(cards)[0]):
+##            values = self.checkQuinteFlush()[1].sort()
+##            if(values[0] == "J"):
+##                return (True, Card(0,1))
+##            else:
+##                return (False, None)
+##        else:
+##            return (False, None)
     
     def checkQuinteFlush(self, cards):
-        couleurs = [c.family for c in cards]    
-
-        if(self.checkCouleur(cards) and self.checkSuite(cards)):
-            mostFrequentFamily = self.mostFrequent(couleurs)
-            count = 0
-            for color in couleurs:
-                if color == mostFrequentFamily:
-                    count += 1
-                else:
-                    couleurs.pop(color)
-            if count >= 5:
-                values = set([c.number for c in cards])
-                values = list(values)
-                n=0
-                for i in range(len(values)-1):
-                    if(values[i+1] - values[i] == 1):
-                       n += 1
-                    else:
-                        n = 0
-                if n >= 5:
-                    return (True,values)
-                else :
-                    return (False, None)
-            else:
-                return (False, None)
+        #CouleurSetup
+        couleurs = [c.family for c in cards]
+        mostFrequentFamily = self.mostFrequent(couleurs)
+        count = 0
+        for n in couleurs:
+            if n == mostFrequentFamily:
+                count += 1
+        #SuiteSetup
+        p=0
+        last = 0
+        values = set([c.number for c in cards])
+        values = list(values)
+        print(values)
+        for i in values:
+            if last != 0:
+                if i - last == 1:
+                    p += 1
+                last = i
+            else :
+                last = i
+        #End
+        if count >= 5 and p >= 5:
+          flushCards = []
+          for card in cards:
+              if card.family == mostFrequentFamily:
+                  flushCards.append(card.number)
+          flushCards.sort()
+          flushCards = flushCards[::-1][:5]
+          return (True, flushCards)
         else:
-            return (False, None)
+          return (False, None)
         
     def checkCarre(self, cards):
         values = [c.number for c in cards]
