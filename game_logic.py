@@ -73,10 +73,14 @@ class Coin:
 
     def generate_next_texture(self, moneyAmount = 0):
         x = self.frame * 64
-        self.edited = self.base.crop((x, 0, 64, 64)).resize((100, 100))
+
+        if self.frame >= 46:
+            x = 0
+        
+        self.edited = self.base.crop((x, 0, x+64, 64)).resize((50, 50))
         self.tk_image = ImageTk.PhotoImage(self.edited)
 
-        self.frame = (self.frame + 1) % 46
+        self.frame = (self.frame + 1) % 150
 
 class Player:
     startingMoney = 1000
@@ -164,7 +168,7 @@ class Partie:
 
     def draw(self, isForGame, amount = 1, playerIndex = 0):
         if(len(self.cardsLeft) <= 0):
-            return system.write("Error : The deck isn't supposed to be empty !", "ERROR")
+            return print("Error : The deck isn't supposed to be empty !")
         else :
             for i in range(0, amount):
                 if(isForGame == False) :
@@ -212,10 +216,10 @@ class Partie:
         cardsToCheck = self.players[playerIndex].getHand() + self.cardsInGame
         playerIndex += 1
         cardsToCheck = self.sort(cardsToCheck)
-        #if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#BUG
-        #    print("Quinte Flush Royale" + " " + str(playerIndex))
-        #    return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
-        if self.checkQuinteFlush(cardsToCheck)[0]:#
+##        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#BUG
+##            print("Quinte Flush Royale" + " " + str(playerIndex))
+##            return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
+        if self.checkQuinteFlush(cardsToCheck)[0]:# BUG
             print("Quinte Flush" + " " + str(playerIndex))
             return (9,self.checkQuinteFlush(cardsToCheck)[1])
         elif self.checkCarre(cardsToCheck)[0]:#
@@ -250,15 +254,15 @@ class Partie:
                 highestN = max(n.number, highestN)
             return (1, Card(highestN,1))#
 
-    def checkQuinteFlushRoyale(self, cards):
-        if(self.checkQuinteFlush(cards)[0]):
-            values = self.checkQuinteFlush()[1].sort()
-            if(values[0] == "J"):
-                return (True, Card(0,1))
-            else:
-                return (False, None)
-        else:
-            return (False, None)
+##    def checkQuinteFlushRoyale(self, cards):
+##        if(self.checkQuinteFlush(cards)[0]):
+##            values = self.checkQuinteFlush()[1].sort()
+##            if(values[0] == "J"):
+##                return (True, Card(0,1))
+##            else:
+##                return (False, None)
+##        else:
+##            return (False, None)
     
     def checkQuinteFlush(self, cards):
         #CouleurSetup
@@ -269,7 +273,7 @@ class Partie:
             if n == mostFrequentFamily:
                 count += 1
         #SuiteSetup
-        p=0
+        p = 0
         last = 0
         values = list(set([c.number for c in cards]))
         print(values)
@@ -352,7 +356,6 @@ class Partie:
         last = 0
         values = set([c.number for c in cards])
         values = list(values)
-        print(values)
         for i in values:
             if last != 0:
                 if i - last == 1:
