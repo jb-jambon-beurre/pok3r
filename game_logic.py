@@ -216,7 +216,7 @@ class Partie:
         cardsToCheck = self.players[playerIndex].getHand() + self.cardsInGame
         playerIndex += 1
         cardsToCheck = self.sort(cardsToCheck)
-        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#BUG
+        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#
             print("Quinte Flush Royale" + " " + str(playerIndex))
             return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
         if self.checkQuinteFlush(cardsToCheck)[0]:#
@@ -256,12 +256,10 @@ class Partie:
 
     def checkQuinteFlushRoyale(self, cards):
         if(self.checkQuinteFlush(cards)[0]):
-            values = self.checkQuinteFlush(cards)[1].sort()
-            print(values)
-            if(values[0] == "J"):
-                return (True, Card(0,1))
-            else:
-                return (False, None)
+            for element in cards:
+                if element.number == 14:
+                    return (True, Card(0,1))
+            return (False, None)
         else:
             return (False, None)
     
