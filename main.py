@@ -118,13 +118,13 @@ class Graphics:
             self.update()
 
     def show_coins(self, player_n = 1):
-        h = "h"+str(player_n)
-        if h in self.canvas_ids.keys():
-            self.canvas.delete(self.canvas_ids[h])
+        c = "c"+str(player_n)
+        if c in self.canvas_ids.keys():
+            self.canvas.delete(self.canvas_ids[c])
 
         self.coins[player_n - 1].generate_next_texture()
 
-        self.canvas_ids[h] = self.canvas.create_image(64, 64, image=self.coins[player_n - 1].tk_image)
+        self.canvas_ids[c] = self.canvas.create_image(64, 64, image=self.coins[player_n - 1].tk_image)
 
     def show_hand(self, hand, player_n = 1):
         h = "h"+str(player_n)

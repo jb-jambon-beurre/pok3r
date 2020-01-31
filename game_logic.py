@@ -121,16 +121,16 @@ class Partie:
         #self.cardsLeft = Card.full_cards_list()
         #r.shuffle(self.cardsLeft)
         self.cardsLeft = [
-            Card(2,3),  #Joueur 1
-            Card(3,3),
+            Card(9,3),  #Joueur 1
+            Card(8,3),
 
             Card(14,2), #Joueur 2
             Card(14,2),
 
-            Card(12,3),  #Tapis
-            Card(8,3),
-            Card(9,3),
-            Card(5,0),
+            Card(7,3),  #Tapis
+            Card(6,3),
+            Card(5,3),
+            Card(7,0),
             Card(2,0),
 
             Card(9,3)   #Placeholder
@@ -213,9 +213,9 @@ class Partie:
         playerIndex += 1
         cardsToCheck = self.sort(cardsToCheck)
         #if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#BUG
-         #   print("Quinte Flush Royale" + " " + str(playerIndex))
-          #  return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
-        if self.checkQuinteFlush(cardsToCheck)[0]:#BUG quinte flush
+        #    print("Quinte Flush Royale" + " " + str(playerIndex))
+        #    return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
+        if self.checkQuinteFlush(cardsToCheck)[0]:#
             print("Quinte Flush" + " " + str(playerIndex))
             return (9,self.checkQuinteFlush(cardsToCheck)[1])
         elif self.checkCarre(cardsToCheck)[0]:#
@@ -250,15 +250,15 @@ class Partie:
                 highestN = max(n.number, highestN)
             return (1, Card(highestN,1))#
 
-##    def checkQuinteFlushRoyale(self, cards):
-##        if(self.checkQuinteFlush(cards)[0]):
-##            values = self.checkQuinteFlush()[1].sort()
-##            if(values[0] == "J"):
-##                return (True, Card(0,1))
-##            else:
-##                return (False, None)
-##        else:
-##            return (False, None)
+    def checkQuinteFlushRoyale(self, cards):
+        if(self.checkQuinteFlush(cards)[0]):
+            values = self.checkQuinteFlush()[1].sort()
+            if(values[0] == "J"):
+                return (True, Card(0,1))
+            else:
+                return (False, None)
+        else:
+            return (False, None)
     
     def checkQuinteFlush(self, cards):
         #CouleurSetup
@@ -271,16 +271,13 @@ class Partie:
         #SuiteSetup
         p=0
         last = 0
-        values = set([c.number for c in cards])
-        values = list(values)
+        values = list(set([c.number for c in cards]))
         print(values)
-        for i in values:
+        for element in values:
             if last != 0:
-                if i - last == 1:
+                if element - last == 1:
                     p += 1
-                last = i
-            else :
-                last = i
+            last = element
         #End
         if count >= 5 and p >= 5:
           flushCards = []
