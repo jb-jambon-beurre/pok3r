@@ -73,10 +73,14 @@ class Coin:
 
     def generate_next_texture(self, moneyAmount = 0):
         x = self.frame * 64
-        self.edited = self.base.crop((x, 0, 64, 64)).resize((100, 100))
+
+        if self.frame >= 46:
+            x = 0
+        
+        self.edited = self.base.crop((x, 0, x+64, 64)).resize((50, 50))
         self.tk_image = ImageTk.PhotoImage(self.edited)
 
-        self.frame = (self.frame + 1) % 46
+        self.frame = (self.frame + 1) % 150
 
 class Player:
     startingMoney = 1000
@@ -164,7 +168,7 @@ class Partie:
 
     def draw(self, isForGame, amount = 1, playerIndex = 0):
         if(len(self.cardsLeft) <= 0):
-            return system.write("Error : The deck isn't supposed to be empty !", "ERROR")
+            return print("Error : The deck isn't supposed to be empty !")
         else :
             for i in range(0, amount):
                 if(isForGame == False) :
