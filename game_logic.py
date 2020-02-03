@@ -76,7 +76,7 @@ class Coin:
 
         if self.frame >= 46:
             x = 0
-        
+
         self.edited = self.base.crop((x, 0, x+64, 64)).resize((50, 50))
         self.tk_image = ImageTk.PhotoImage(self.edited)
 
@@ -263,7 +263,7 @@ class Partie:
 ##                return (False, None)
 ##        else:
 ##            return (False, None)
-    
+
     def checkQuinteFlush(self, cards):
         #CouleurSetup
         couleurs = [c.family for c in cards]
