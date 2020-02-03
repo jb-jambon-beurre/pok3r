@@ -122,23 +122,23 @@ class Partie:
     cardsLeft = []
 
     def __init__(self, nbPlayers = 2, minimalBet = 10):
-        #self.cardsLeft = Card.full_cards_list()
-        #r.shuffle(self.cardsLeft)
-        self.cardsLeft = [
-            Card(2,3),  #Joueur 1
-            Card(3,3),
-
-            Card(14,2), #Joueur 2
-            Card(14,2),
-
-            Card(12,3),  #Tapis
-            Card(8,3),
-            Card(9,3),
-            Card(5,0),
-            Card(2,0),
-
-            Card(9,3)   #Placeholder
-        ]
+        self.cardsLeft = Card.full_cards_list()
+        r.shuffle(self.cardsLeft)
+##        self.cardsLeft = [
+##            Card(14,3),  #Joueur 1
+##            Card(13,3),
+##
+##            Card(14,2), #Joueur 2
+##            Card(14,2),
+##
+##            Card(12,3),  #Tapis
+##            Card(11,3),
+##            Card(10,3),
+##            Card(7,0),
+##            Card(2,0),
+##
+##            Card(9,3)   #Placeholder
+##        ]
 
         self.minimalBet = minimalBet
 
@@ -216,10 +216,10 @@ class Partie:
         cardsToCheck = self.players[playerIndex].getHand() + self.cardsInGame
         playerIndex += 1
         cardsToCheck = self.sort(cardsToCheck)
-        #if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#BUG
-         #   print("Quinte Flush Royale" + " " + str(playerIndex))
-          #  return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
-        if self.checkQuinteFlush(cardsToCheck)[0]:#BUG quinte flush
+        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#
+            print("Quinte Flush Royale" + " " + str(playerIndex))
+            return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
+        if self.checkQuinteFlush(cardsToCheck)[0]:#
             print("Quinte Flush" + " " + str(playerIndex))
             return (9,self.checkQuinteFlush(cardsToCheck)[1])
         elif self.checkCarre(cardsToCheck)[0]:#
@@ -254,15 +254,14 @@ class Partie:
                 highestN = max(n.number, highestN)
             return (1, Card(highestN,1))#
 
-##    def checkQuinteFlushRoyale(self, cards):
-##        if(self.checkQuinteFlush(cards)[0]):
-##            values = self.checkQuinteFlush()[1].sort()
-##            if(values[0] == "J"):
-##                return (True, Card(0,1))
-##            else:
-##                return (False, None)
-##        else:
-##            return (False, None)
+    def checkQuinteFlushRoyale(self, cards):
+        if(self.checkQuinteFlush(cards)[0]):
+            for element in cards:
+                if element.number == 14:
+                    return (True, Card(0,1))
+            return (False, None)
+        else:
+            return (False, None)
 
     def checkQuinteFlush(self, cards):
         #CouleurSetup
@@ -272,21 +271,21 @@ class Partie:
         for n in couleurs:
             if n == mostFrequentFamily:
                 count += 1
-        #SuiteSetup
-        p=0
-        last = 0
-        values = set([c.number for c in cards])
-        values = list(values)
-        print(values)
-        for i in values:
-            if last != 0:
-                if i - last == 1:
-                    p += 1
-                last = i
-            else :
-                last = i
+        #print("Count :", count)
+        #SuiteSetup1
+        p = 0
+        last = []
+        values = list(set([c.number for c in cards]))
+        #print(values)
+        for element in values:
+            if last != []:
+                for ele in last:
+                    if element - ele == 1:
+                        p += 1
+            last.append(element)
+        #print("p :", p)
         #End
-        if count >= 5 and p >= 5:
+        if count >= 5 and p >= 4:
           flushCards = []
           for card in cards:
               if card.family == mostFrequentFamily:
@@ -359,15 +358,12 @@ class Partie:
         last = 0
         values = set([c.number for c in cards])
         values = list(values)
-        print(values)
         for i in values:
             if last != 0:
                 if i - last == 1:
                     n += 1
-                last = i
-            else :
-                last = i
-        if n >= 5:
+            last = i
+        if n >= 4:
             return (True, values[:5])
         else :
             return (False, None)
