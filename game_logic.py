@@ -272,7 +272,7 @@ class Partie:
             if n == mostFrequentFamily:
                 count += 1
         #print("Count :", count)
-        #SuiteSetup
+        #SuiteSetup1
         p = 0
         last = []
         values = list(set([c.number for c in cards]))
