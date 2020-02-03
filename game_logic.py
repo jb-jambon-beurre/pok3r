@@ -122,23 +122,23 @@ class Partie:
     cardsLeft = []
 
     def __init__(self, nbPlayers = 2, minimalBet = 10):
-        #self.cardsLeft = Card.full_cards_list()
-        #r.shuffle(self.cardsLeft)
-        self.cardsLeft = [
-            Card(14,3),  #Joueur 1
-            Card(13,3),
-
-            Card(14,2), #Joueur 2
-            Card(14,2),
-
-            Card(12,3),  #Tapis
-            Card(11,3),
-            Card(10,3),
-            Card(7,0),
-            Card(2,0),
-
-            Card(9,3)   #Placeholder
-        ]
+        self.cardsLeft = Card.full_cards_list()
+        r.shuffle(self.cardsLeft)
+##        self.cardsLeft = [
+##            Card(14,3),  #Joueur 1
+##            Card(13,3),
+##
+##            Card(14,2), #Joueur 2
+##            Card(14,2),
+##
+##            Card(12,3),  #Tapis
+##            Card(11,3),
+##            Card(10,3),
+##            Card(7,0),
+##            Card(2,0),
+##
+##            Card(9,3)   #Placeholder
+##        ]
 
         self.minimalBet = minimalBet
 
@@ -276,7 +276,7 @@ class Partie:
         p = 0
         last = []
         values = list(set([c.number for c in cards]))
-        print(values)
+        #print(values)
         for element in values:
             if last != []:
                 for ele in last:
@@ -362,10 +362,8 @@ class Partie:
             if last != 0:
                 if i - last == 1:
                     n += 1
-                last = i
-            else :
-                last = i
-        if n >= 5:
+            last = i
+        if n >= 4:
             return (True, values[:5])
         else :
             return (False, None)
