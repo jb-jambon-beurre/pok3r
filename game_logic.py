@@ -83,7 +83,7 @@ class Coin:
         self.frame = (self.frame + 1) % 150
 
 class Player:
-    startingMoney = 1000
+    startingMoney = 100
     names = ["Jackouille la fripouille", "___xXx__daRk_KikouLolDu92__xXx___", "Pigeon", "Coq", "Mouton", "Alban", "Maxence", "Megaman", "Yvette", "Verrue puante", "Asticot velu"]
     def __init__(self):
         self.money = self.startingMoney
@@ -116,12 +116,13 @@ class Player:
         return self.hand
 
 class Partie:
+    blinde = 0
     minimalBet = 0
     players = []
     cardsInGame = []
     cardsLeft = []
 
-    def __init__(self, nbPlayers = 2, minimalBet = 10):
+    def __init__(self, nbPlayers = 2, blinde = 10):
         self.cardsLeft = Card.full_cards_list()
         r.shuffle(self.cardsLeft)
 ##        self.cardsLeft = [
@@ -139,8 +140,7 @@ class Partie:
 ##
 ##            Card(9,3)   #Placeholder
 ##        ]
-
-        self.minimalBet = minimalBet
+        self.blinde = blinde
 
         for i in range(0, nbPlayers):
             self.players.append(Player()) #Generé dans cette classe

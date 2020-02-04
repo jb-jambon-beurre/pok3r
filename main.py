@@ -58,6 +58,9 @@ class Graphics:
                         self.betamount[c] = self.partie.players[c].getMoney()
 
                     if c == 1:
+                        self.partie.minimalBet = 0
+                        for i in range(2):
+                            self.betamount[i] = 0
                         self.partie.draw(True)
                         if len(self.partie.cardsInGame) >= 5:
                             c = self.partie.compare()
@@ -108,7 +111,7 @@ class Graphics:
         partie.start()
         self.partie = partie
 
-        self.betamount[0] = self.betamount[1] = self.partie.minimalBet
+        self.betamount[0] = self.betamount[1] = self.partie.blinde
 
         self.canvas_ids["money2"] = self.canvas.create_text(500, 40, fill="black", text="")
         self.canvas_ids["money1"] = self.canvas.create_text(500, 460, fill="black", text="")
