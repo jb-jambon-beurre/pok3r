@@ -7,8 +7,8 @@ Project in alpha state, cf. git commits
 ## Index
 
 1. [Projet summary](#project-summary)
-  - [Bare-minimal informations](#bare-minimal-summary)
-  - [Informations on the code](#informations-on-the-code)
+    - [Bare-minimal informations](#bare-minimal-informations)
+    - [Informations on the code](#informations-on-the-code)
 2. [User Manual](#user-manual)
 
 ## Project summary
