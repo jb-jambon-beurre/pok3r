@@ -365,7 +365,7 @@ class Partie:
         last = 0
         values = set([c.number for c in cards])
         values = list(values)
-        print(values)
+        #print(values)
         isDone = False
         while isDone == False:
             isDone = True

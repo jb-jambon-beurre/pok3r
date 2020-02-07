@@ -43,7 +43,6 @@ class Graphics:
 
     def processKeys(self, key):
         c = self.currentPlayer
-
         if self.partie != None:
             if not self.finished:              
                 if key.char == "+" and self.betamount[c] < self.partie.players[c].getMoney():
