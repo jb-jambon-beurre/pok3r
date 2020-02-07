@@ -16,6 +16,7 @@ Project in in alpha state, cf. git commits
 ### Bare-minimal informations
 
 The project is named "Pok3r" because it's a poker game on computers.
+
 Project members are [Max1Truc](https://github.com/Max1Truc) and [ALB5000](https://github.com/Alb5000-Dev).
 
 ### Informations on the code

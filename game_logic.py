@@ -126,25 +126,25 @@ class Partie:
         self.cardsLeft = Card.full_cards_list()
         r.shuffle(self.cardsLeft)
 
-        
+        """
         # En cas de force majeure, utiliser le code
         # suivant pour tester un cas précis de partie
         self.cardsLeft = [
-            Card(140,5),  #Joueur 1
-            Card(13,3),
+            Card(2,5),  #Joueur 1
+            Card(3,5),
 
-            Card(14,2), #Joueur 2
-            Card(14,2),
+            Card(14,5), #Joueur 2
+            Card(14,5),
 
-            Card(12,3),  #Tapis
-            Card(11,3),
-            Card(10,3),
-            Card(7,0),
-            Card(2,0),
+            Card(8,5),  #Tapis
+            Card(9,5),
+            Card(12,5),
+            Card(13,5),
+            Card(14,5),
 
             Card(9,3)   #Placeholder
         ]
-        
+        """
 
         self.blinde = blinde
 
@@ -273,9 +273,10 @@ class Partie:
         #CouleurSetup
         couleurs = [c.family for c in cards]
         mostFrequentFamily = self.mostFrequent(couleurs)
+        #print(mostFrequentFamily)
         count = 0
         for n in couleurs:
-            if n == mostFrequentFamily:
+            if n == mostFrequentFamily and mostFrequentFamily < 4:
                 count += 1
         #print("Count :", count)
         #SuiteSetup1
@@ -346,7 +347,7 @@ class Partie:
         mostFrequentFamily = self.mostFrequent(couleurs)
         count = 0
         for n in couleurs:
-            if n == mostFrequentFamily:
+            if n == mostFrequentFamily and mostFrequentFamily < 4:
                 count += 1
         if count >= 5:
           flushCards = []
@@ -364,11 +365,18 @@ class Partie:
         last = 0
         values = set([c.number for c in cards])
         values = list(values)
-        for i in values:
-            if last != 0:
-                if i - last == 1:
-                    n += 1
-            last = i
+        print(values)
+        isDone = False
+        while isDone == False:
+            isDone = True
+            for val in values:
+                if last != 0:
+                    if val - last == 1:
+                        n += 1
+                    else:
+                        values.remove(val)
+                        isDone = False
+                last = val
         if n >= 4:
             return (True, values[:5])
         else :
