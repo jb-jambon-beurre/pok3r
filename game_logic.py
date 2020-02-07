@@ -126,11 +126,11 @@ class Partie:
         self.cardsLeft = Card.full_cards_list()
         r.shuffle(self.cardsLeft)
 
-        """
+        
         # En cas de force majeure, utiliser le code
         # suivant pour tester un cas précis de partie
         self.cardsLeft = [
-            Card(14,3),  #Joueur 1
+            Card(140,3),  #Joueur 1
             Card(13,3),
 
             Card(14,2), #Joueur 2
@@ -144,7 +144,7 @@ class Partie:
 
             Card(9,3)   #Placeholder
         ]
-        """
+        
 
         self.blinde = blinde
 
