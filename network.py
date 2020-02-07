@@ -47,7 +47,7 @@ class Network(Thread):
 
     def run(self):
         self.running = True
-        
+
         if self.server:
             while self.running:
                 conn, addr = self.socket.accept()
@@ -56,7 +56,7 @@ class Network(Thread):
                     print('Connected by', addr)
                     for msg in self.pending:
                         conn.sendall(msg)
-                    
+
                     while True:
                         data = conn.recv(1024)
                         if not data: break

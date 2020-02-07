@@ -143,7 +143,7 @@ class Graphics:
 
     def show_hand(self, hand, player_n = 1):
         h = "h"+str(player_n)
-        
+
         if h in self.canvas_ids.keys():
             if len(self.canvas_ids[h]) > 0:
                 for i in self.canvas_ids[h]:
