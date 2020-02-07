@@ -19,8 +19,8 @@ class Card:
                 self.base = Image.open("card_face_carreaux.png")
             elif self.family == 3: # Coeur
                 self.base = Image.open("card_face_coeur.png")
-            else:
-                return
+            else: #Placeholder
+                self.base = Image.open("card_face_placeholder.png")
 
             self.font = ImageFont.truetype("LemonMilkbold.otf", 20)
 
@@ -130,7 +130,7 @@ class Partie:
         # En cas de force majeure, utiliser le code
         # suivant pour tester un cas précis de partie
         self.cardsLeft = [
-            Card(140,3),  #Joueur 1
+            Card(140,5),  #Joueur 1
             Card(13,3),
 
             Card(14,2), #Joueur 2
