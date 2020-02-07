@@ -2,7 +2,7 @@
 
 ## Changelog
 
-Project in in alpha state, cf. git commits
+Project in alpha state, cf. git commits
 
 ## Index
 
