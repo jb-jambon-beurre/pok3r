@@ -191,11 +191,17 @@ class Partie:
         elif(self.check(0)[0] < self.check(1)[0]):
             print("Victoire joueur 2 car meilleur type de main")
             return 2
-        elif(self.pScore(0) > self.pScore(1)):
-            print("Victoire joueur 1 car meilleur main contre le même type de main")
+##        elif(self.check(0)[1] > self.check(1)[1]):
+##            print("Victoire joueur 1 car meilleur main contre le même type de main")
+##            return 1
+##        elif(self.check(0)[1] < self.check(1)[1]):
+##            print("Victoire joueur 2 car meilleur main contre le même type de main")
+##            return 2
+        elif(self.pScore(0) > self.p
+            print("Victoire joueur 1 car meilleur pScore")
             return 1
         elif(self.pScore(0) < self.pScore(1)):
-            print("Victoire joueur 2 car meilleur main contre le même type de main")
+            print("Victoire joueur 2 car meilleur pScore")
             return 2
         else:
             print("Egalité")
