@@ -126,25 +126,23 @@ class Partie:
         self.cardsLeft = Card.full_cards_list()
         r.shuffle(self.cardsLeft)
 
-        """
         # En cas de force majeure, utiliser le code
         # suivant pour tester un cas précis de partie
         self.cardsLeft = [
             Card(2,5),  #Joueur 1
             Card(3,5),
 
-            Card(14,5), #Joueur 2
-            Card(14,5),
+            Card(8,5), #Joueur 2
+            Card(7,5),
 
-            Card(8,5),  #Tapis
-            Card(9,5),
-            Card(12,5),
-            Card(13,5),
-            Card(14,5),
+            Card(4,5),  #Tapis
+            Card(5,5),
+            Card(6,5),
+            Card(130,5),
+            Card(104,5),
 
             Card(9,3)   #Placeholder
         ]
-        """
 
         self.blinde = blinde
 
@@ -191,21 +189,23 @@ class Partie:
         elif(self.check(0)[0] < self.check(1)[0]):
             print("Victoire joueur 2 car meilleur type de main")
             return 2
-##        elif(self.check(0)[1] > self.check(1)[1]):
-##            print("Victoire joueur 1 car meilleur main contre le même type de main")
-##            return 1
-##        elif(self.check(0)[1] < self.check(1)[1]):
-##            print("Victoire joueur 2 car meilleur main contre le même type de main")
-##            return 2
-        elif(self.pScore(0) > self.p
-            print("Victoire joueur 1 car meilleur pScore")
-            return 1
-        elif(self.pScore(0) < self.pScore(1)):
-            print("Victoire joueur 2 car meilleur pScore")
-            return 2
-        else:
-            print("Egalité")
-            return -1
+        else :
+            if(self.check(0)[1] > self.check(1)[1]):
+                print("Victoire joueur 1 car meilleur main contre le même type de main")
+                return 1
+            elif(self.check(0)[1] < self.check(1)[1]):
+                print("Victoire joueur 2 car meilleur main contre le même type de main")
+                return 2
+            else :
+                if(self.pScore(0) > self.pScore(1)):
+                    print("Victoire joueur 1 car meilleur pScore")
+                    return 1
+                elif(self.pScore(0) < self.pScore(1)):
+                    print("Victoire joueur 2 car meilleur pScore")
+                    return 2
+                else:
+                    print("Egalité")
+                    return -1
 
     def pScore(self, playerIndex):
         cards = self.players[playerIndex].getHand() + self.cardsInGame
@@ -242,14 +242,10 @@ class Partie:
             return (7,self.checkFull(cardsToCheck)[1])
         elif self.checkCouleur(cardsToCheck)[0]:#
             print("Couleur" + " " + str(playerIndex))
-            n = reduce(lambda a,b: a+b, self.checkCouleur(cardsToCheck)[1])
-            c = Card(n,1)
-            return (6,c)
+            return (6,self.checkCouleur(cardsToCheck)[1])
         elif self.checkSuite(cardsToCheck)[0]:#
             print("Suite" + " " + str(playerIndex))
-            n = reduce(lambda a,b: a+b, self.checkSuite(cardsToCheck)[1])
-            c = Card(n,1)
-            return (5,c)
+            return (5,self.checkSuite(cardsToCheck)[1])
         elif self.checkBrelan(cardsToCheck)[0]:#
             print("Brelan" + " " + str(playerIndex))
             return (4,self.checkBrelan(cardsToCheck)[1])
@@ -270,7 +266,7 @@ class Partie:
         if(self.checkQuinteFlush(cards)[0]):
             for element in cards:
                 if element.number == 14:
-                    return (True, Card(0,1))
+                    return (True, 0)
             return (False, None)
         else:
             return (False, None)
@@ -304,8 +300,7 @@ class Partie:
               if card.family == mostFrequentFamily:
                   flushCards.append(card.number)
           flushCards.sort()
-          flushCards = flushCards[::-1][:5]
-          return (True, flushCards)
+          return (True, flushCards[-1])
         else:
           return (False, None)
 
@@ -317,7 +312,7 @@ class Partie:
             if n == mostFrequentValue:
                 count += 1
         if count == 4:
-            return (True, Card(mostFrequentValue,1))
+            return (True, mostFrequentValue)
         else:
             return (False, None)
 
@@ -344,7 +339,7 @@ class Partie:
                 count2 += 1
         ###
         if count == 3 and count2 == 2:
-            return (True, Card(mostFrequentValue + secondMostFrequentValue, 1))
+            return (True, mostFrequentValue + secondMostFrequentValue)
         else:
             return (False, None)
 
@@ -361,8 +356,7 @@ class Partie:
               if card.family == mostFrequentFamily:
                   flushCards.append(card.number)
           flushCards.sort()
-          flushCards = flushCards[::-1][:5]
-          return (True, flushCards)
+          return (True, flushCards[-1])
         else:
           return (False, None)
 
@@ -376,6 +370,8 @@ class Partie:
         while isDone == False:
             isDone = True
             for val in values:
+##                if n >= 4 :
+##                    break
                 if last != 0:
                     if val - last == 1:
                         n += 1
@@ -384,7 +380,9 @@ class Partie:
                         isDone = False
                 last = val
         if n >= 4:
-            return (True, values[:5])
+            if len(values) <= 1:
+                values.append(0)
+            return (True, values[-1])
         else :
             return (False, None)
 
@@ -396,7 +394,7 @@ class Partie:
             if n == mostFrequentValue:
                 count += 1
         if count == 3:
-            return (True, Card(mostFrequentValue,1))
+            return (True, mostFrequentValue)
         else:
             return (False, None)
 
@@ -423,7 +421,7 @@ class Partie:
                 count2 += 1
         ###
         if count == 2 and count2 == 2:
-            return (True, Card(mostFrequentValue + secondMostFrequentValue, 1))
+            return (True, mostFrequentValue + secondMostFrequentValue)
         else:
             return (False, None)
 
@@ -435,7 +433,7 @@ class Partie:
             if n == mostFrequentValue:
                 count += 1
         if count == 2:
-            return (True, Card(mostFrequentValue,1))
+            return (True, mostFrequentValue)
         else:
             return False, (None)
 
