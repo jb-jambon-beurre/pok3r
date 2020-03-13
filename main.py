@@ -21,10 +21,11 @@ class Graphics:
         self.window.resizable(False, False)
         self.window.title("Pok3r")
         self.canvas = Canvas(self.window, width = 1000, height = 500)
-        self.canvas.pack()
+        self.canvas.grid()
         self.canvas_ids = {}
 
         self.finished = False
+        self.network_initialized = False
 
         self.window.bind("<KeyPress>", self.processKeys)
 
@@ -113,6 +114,18 @@ class Graphics:
         except:
             exit(0)
 
+    def set_mode(self, mode):
+        self.mode = mode
+
+    def set_mode_self(self):
+        if self.network_initialized: return
+        self.set_mode("self")
+        self.network_initialized = True
+
+    def set_mode_net(self):
+        if self.network_initialized: return
+        self.set_mode("net")
+
     def start(self, partie):
         partie.start()
         self.partie = partie
@@ -126,6 +139,32 @@ class Graphics:
 
         while True:
             self.update()
+
+    def initialize_network(self):
+        self.network_initialized = False
+
+        self.canvas.grid_forget()
+
+        self.canvas_ids["net_lbl1"] = \
+            Label(self.window, text="Please choose a game mode")
+        self.canvas_ids["net_lbl1"].grid(row = 1, column = 1, columnspan = 2)
+
+        self.canvas_ids["net_but_self"] = \
+            Button(self.window, text="Self vs Self", command=self.set_mode_self)
+        self.canvas_ids["net_but_self"].grid(row = 2, column = 1)
+
+        self.canvas_ids["net_but_net"] = \
+            Button(self.window, text="Network", command=self.set_mode_net)
+        self.canvas_ids["net_but_net"].grid(row = 2, column = 2)
+
+        while not self.network_initialized:
+            self.window.update()
+            sleep(0.1)
+
+        self.canvas_ids["net_lbl1"].destroy()
+        self.canvas_ids["net_but_self"].destroy()
+        self.canvas_ids["net_but_net"].destroy()
+        self.canvas.grid()
 
     def show_coins(self, player_n = 1):
         c = "c"+str(player_n)
@@ -224,7 +263,7 @@ class Graphics:
             self.window.update()
 
         self.canvas.delete(image_id)
-        self.canvas.pack()
+        self.canvas.grid()
         self.window.update()
 
 if __name__ == "__main__":
@@ -235,5 +274,6 @@ if __name__ == "__main__":
     game_window.splash()
 
     while True:
+        game_window.initialize_network()
         partie_actuelle = Partie()
         game_window.start(partie_actuelle)
