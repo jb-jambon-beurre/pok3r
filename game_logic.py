@@ -29,7 +29,7 @@ class Card:
         else:
             self.base = Image.open("card_back.png")
 
-        self.edited = self.base.resize((100, 140)).rotate(rotation, expand=1)
+        self.edited = self.base.resize((100, 140), resample=Image.NEAREST).rotate(rotation, expand=1)
         self.tk_image = ImageTk.PhotoImage(self.edited)
 
     def full_cards_list():

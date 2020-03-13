@@ -189,7 +189,7 @@ class Graphics:
         # Load image
         image = Image.open("jb_splash.png")
         cropped = image.crop((0, 0, 64, 64))
-        cropped = cropped.resize((cropped.height * 5, cropped.width * 5))
+        cropped = cropped.resize((cropped.height * 5, cropped.width * 5), resample=Image.NEAREST)
         tk_image = ImageTk.PhotoImage(cropped)
 
         # Show base image for 2 seconds
@@ -211,7 +211,7 @@ class Graphics:
                 x += 64
                 if x >= image.width: x = 0
                 cropped = image.crop((x, 0, x + 64, 64))
-                cropped = cropped.resize((cropped.height * 5, cropped.width * 5))
+                cropped = cropped.resize((cropped.height * 5, cropped.width * 5), resample=Image.NEAREST)
                 tk_image = ImageTk.PhotoImage(cropped)
                 self.canvas.itemconfig(image_id, image=tk_image)
             self.window.update()
