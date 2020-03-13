@@ -128,6 +128,7 @@ class Partie:
 
         # En cas de force majeure, utiliser le code
         # suivant pour tester un cas précis de partie
+        """
         self.cardsLeft = [
             Card(2,5),  #Joueur 1
             Card(3,5),
@@ -143,6 +144,7 @@ class Partie:
 
             Card(9,3)   #Placeholder
         ]
+        """
 
         self.blinde = blinde
 
