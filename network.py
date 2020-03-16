@@ -1,24 +1,25 @@
 import socket
 from threading import Thread
 
+
 class Network(Thread):
-#   Exemple de programme client-serveur:
-#
-# n = Network()
-# choix = input("client/serveur? ")
-# if choix == "client": # Mode client
-#     n.connect(input("IP: "))
-# else: # Mode serveur
-#     n.listen() # On lance le serveur en ecoute
-#
-# # On donne une fonction à exécuter quand on reçoit un message avec le header "textemessagerie"
-# n.handle_message("textemessagerie",
-#     lambda msg: print("\n" + msg + "\n>>> ", end="")
-# )
-#
-# while True: # Pour toujours
-#     n.send("textemessagerie", input(">>> ")) # On envoie un message avec le header "textemessagerie"
-# n.join() # On attend que le Thread se termine (probablement inutile avec une interface graphique)
+    #   Exemple de programme client-serveur:
+    #
+    # n = Network()
+    # choix = input("client/serveur? ")
+    # if choix == "client": # Mode client
+    #     n.connect(input("IP: "))
+    # else: # Mode serveur
+    #     n.listen() # On lance le serveur en ecoute
+    #
+    # # On donne une fonction à exécuter quand on reçoit un message avec le header "textemessagerie"
+    # n.handle_message("textemessagerie",
+    #     lambda msg: print("\n" + msg + "\n>>> ", end="")
+    # )
+    #
+    # while True: # Pour toujours
+    #     n.send("textemessagerie", input(">>> ")) # On envoie un message avec le header "textemessagerie"
+    # n.join() # On attend que le Thread se termine (probablement inutile avec une interface graphique)
 
     pending = []
     handles = {}
@@ -45,6 +46,18 @@ class Network(Thread):
         self.socket.listen(1)
         self.start()
 
+    def get_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('1.1.1.1', 1))
+            IP = s.getsockname()[0]
+        except:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
+
     def run(self):
         self.running = True
 
@@ -59,7 +72,8 @@ class Network(Thread):
 
                     while True:
                         data = conn.recv(1024)
-                        if not data: break
+                        if not data:
+                            break
                         self.handle_data(data)
                 self.connection = False
         else:
@@ -69,7 +83,8 @@ class Network(Thread):
 
             while self.running:
                 data = self.socket.recv(1024)
-                if data: self.handle_data(data)
+                if data:
+                    self.handle_data(data)
 
     def send(self, message_type, message):
         data = (message_type + "\0" + message).encode('utf8')

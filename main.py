@@ -4,10 +4,10 @@
 # 0------------------0
 
 
-
 from tkinter import *
 from PIL import Image, ImageTk, ImageFont, ImageDraw
 from time import time, sleep
+from sys import exit
 
 # Classe pour la communication réseau, fichier network.py
 from network import Network
@@ -15,12 +15,13 @@ from network import Network
 # Gestion d'une partie
 from game_logic import Card, Partie, Coin
 
+
 class Graphics:
     def __init__(self):
         self.window = Tk()
         self.window.resizable(False, False)
         self.window.title("Pok3r")
-        self.canvas = Canvas(self.window, width = 1000, height = 500)
+        self.canvas = Canvas(self.window, width=1000, height=500)
         self.canvas.grid()
         self.canvas_ids = {}
 
@@ -29,17 +30,19 @@ class Graphics:
 
         self.window.bind("<KeyPress>", self.processKeys)
 
+        self.network = Network()
+
         self.betamount = [0, 0]
         self.currentPlayer = 0
         self.partie = None
 
-        self.coins = [ Coin(), Coin() ]
+        self.coins = [Coin(), Coin()]
 
         # Cartes face cachée de la Pioche
-        self.draw = [ Card(-1, 0), Card(-1, 0), Card(-1, 0) ]
+        self.draw = [Card(-1, 0), Card(-1, 0), Card(-1, 0)]
         orientation = 0
         for card in self.draw:
-            card.generate_texture(orientation, face = False)
+            card.generate_texture(orientation, face=False)
             orientation -= 5
 
     def processKeys(self, key):
@@ -78,7 +81,8 @@ class Graphics:
                         self.currentPlayer += 1
 
                     if self.partie.players[self.currentPlayer].getMoney() < self.partie.minimalBet:
-                        self.betamount[self.currentPlayer] = self.partie.players[self.currentPlayer].getMoney()
+                        self.betamount[self.currentPlayer] = self.partie.players[self.currentPlayer].getMoney(
+                        )
                     else:
                         self.betamount[self.currentPlayer] = self.partie.minimalBet
             else:
@@ -91,17 +95,21 @@ class Graphics:
             player_n += 1
             self.show_hand(player.hand, player_n)
 
-        bets = [ self.betamount[0], self.betamount[1] ]
+        bets = [self.betamount[0], self.betamount[1]]
 
         if bets[0] == 0:
             bets[0] = str(bets[0]) + " (check)"
         if bets[1] == 0:
             bets[1] = str(bets[1]) + " (check)"
 
-        self.canvas.itemconfig(self.canvas_ids["money1"], text="Money: " + str(self.partie.players[0].getMoney()))
-        self.canvas.itemconfig(self.canvas_ids["money2"], text="Money: " + str(self.partie.players[1].getMoney()))
-        self.canvas.itemconfig(self.canvas_ids["betamount1"], text="Bet amount: " + str(bets[0]))
-        self.canvas.itemconfig(self.canvas_ids["betamount2"], text="Bet amount: " + str(bets[1]))
+        self.canvas.itemconfig(
+            self.canvas_ids["money1"], text="Money: " + str(self.partie.players[0].getMoney()))
+        self.canvas.itemconfig(
+            self.canvas_ids["money2"], text="Money: " + str(self.partie.players[1].getMoney()))
+        self.canvas.itemconfig(
+            self.canvas_ids["betamount1"], text="Bet amount: " + str(bets[0]))
+        self.canvas.itemconfig(
+            self.canvas_ids["betamount2"], text="Bet amount: " + str(bets[1]))
 
         self.show_drawed(self.partie.cardsInGame)
 
@@ -114,16 +122,37 @@ class Graphics:
         except:
             exit(0)
 
+    def set_server(self):
+        self.network.listen()
+
+        self.canvas_ids["net_lbl1"].config(
+            text="Please give your IP address to the client : " + self.network.get_ip())
+        self.canvas_ids["net_but_self"].destroy()
+        self.canvas_ids["net_but_net"].destroy()
+
+    def set_client(self):
+        pass
+
     def set_mode(self, mode):
         self.mode = mode
 
     def set_mode_self(self):
-        if self.network_initialized: return
+        if self.network_initialized:
+            return
         self.set_mode("self")
         self.network_initialized = True
 
     def set_mode_net(self):
-        if self.network_initialized: return
+        if self.network_initialized:
+            return
+
+        self.canvas_ids["net_lbl1"].config(
+            text="Do you want to be the server or the client ?")
+        self.canvas_ids["net_but_self"].config(
+            text="Server", command=self.set_server)
+        self.canvas_ids["net_but_net"].config(
+            text="Client", command=self.set_client)
+
         self.set_mode("net")
 
     def start(self, partie):
@@ -132,10 +161,14 @@ class Graphics:
 
         self.betamount[0] = self.betamount[1] = self.partie.blinde
 
-        self.canvas_ids["money2"] = self.canvas.create_text(500, 40, fill="black", text="")
-        self.canvas_ids["money1"] = self.canvas.create_text(500, 460, fill="black", text="")
-        self.canvas_ids["betamount2"] = self.canvas.create_text(500, 20, fill="black", text="")
-        self.canvas_ids["betamount1"] = self.canvas.create_text(500, 480, fill="black", text="")
+        self.canvas_ids["money2"] = self.canvas.create_text(
+            500, 40, fill="black", text="")
+        self.canvas_ids["money1"] = self.canvas.create_text(
+            500, 460, fill="black", text="")
+        self.canvas_ids["betamount2"] = self.canvas.create_text(
+            500, 20, fill="black", text="")
+        self.canvas_ids["betamount1"] = self.canvas.create_text(
+            500, 480, fill="black", text="")
 
         while True:
             self.update()
@@ -147,18 +180,24 @@ class Graphics:
 
         self.canvas_ids["net_lbl1"] = \
             Label(self.window, text="Please choose a game mode")
-        self.canvas_ids["net_lbl1"].grid(row = 1, column = 1, columnspan = 2)
+        self.canvas_ids["net_lbl1"].grid(row=1, column=1, columnspan=2)
 
         self.canvas_ids["net_but_self"] = \
-            Button(self.window, text="Self vs Self", command=self.set_mode_self)
-        self.canvas_ids["net_but_self"].grid(row = 2, column = 1)
+            Button(self.window, text="Self vs Self",
+                   command=self.set_mode_self)
+        self.canvas_ids["net_but_self"].grid(row=2, column=1)
 
         self.canvas_ids["net_but_net"] = \
             Button(self.window, text="Network", command=self.set_mode_net)
-        self.canvas_ids["net_but_net"].grid(row = 2, column = 2)
+        self.canvas_ids["net_but_net"].grid(row=2, column=2)
 
         while not self.network_initialized:
-            self.window.update()
+            try:
+                self.window.update()
+                self.window.update_idletasks()
+            except:
+                exit(0)
+
             sleep(0.1)
 
         self.canvas_ids["net_lbl1"].destroy()
@@ -166,8 +205,8 @@ class Graphics:
         self.canvas_ids["net_but_net"].destroy()
         self.canvas.grid()
 
-    def show_coins(self, player_n = 1):
-        c = "c"+str(player_n)
+    def show_coins(self, player_n=1):
+        c = "c" + str(player_n)
         if c in self.canvas_ids.keys():
             self.canvas.delete(self.canvas_ids[c])
 
@@ -177,10 +216,11 @@ class Graphics:
 
         self.coins[player_n - 1].generate_next_texture()
 
-        self.canvas_ids[c] = self.canvas.create_image(x, y, image=self.coins[player_n - 1].tk_image)
+        self.canvas_ids[c] = self.canvas.create_image(
+            x, y, image=self.coins[player_n - 1].tk_image)
 
-    def show_hand(self, hand, player_n = 1):
-        h = "h"+str(player_n)
+    def show_hand(self, hand, player_n=1):
+        h = "h" + str(player_n)
 
         if h in self.canvas_ids.keys():
             if len(self.canvas_ids[h]) > 0:
@@ -204,8 +244,10 @@ class Graphics:
         if len(hand) == 2:
             hand[0].generate_texture(r1, face=face)
             hand[1].generate_texture(r2, face=face)
-            self.canvas_ids[h].append(self.canvas.create_image(x1, y1, image=hand[0].tk_image))
-            self.canvas_ids[h].append(self.canvas.create_image(x2, y2, image=hand[1].tk_image))
+            self.canvas_ids[h].append(
+                self.canvas.create_image(x1, y1, image=hand[0].tk_image))
+            self.canvas_ids[h].append(
+                self.canvas.create_image(x2, y2, image=hand[1].tk_image))
 
     def show_drawed(self, drawed):
         if "d" in self.canvas_ids.keys():
@@ -217,22 +259,27 @@ class Graphics:
         for card in drawed:
             card.generate_texture(0, face=True)
 
-        self.canvas_ids["d"].append(self.canvas.create_image(220, 250, image=self.draw[0].tk_image))
-        self.canvas_ids["d"].append(self.canvas.create_image(220, 250, image=self.draw[1].tk_image))
-        self.canvas_ids["d"].append(self.canvas.create_image(220, 250, image=self.draw[2].tk_image))
+        self.canvas_ids["d"].append(self.canvas.create_image(
+            220, 250, image=self.draw[0].tk_image))
+        self.canvas_ids["d"].append(self.canvas.create_image(
+            220, 250, image=self.draw[1].tk_image))
+        self.canvas_ids["d"].append(self.canvas.create_image(
+            220, 250, image=self.draw[2].tk_image))
 
         for x in range(0, len(drawed)):
-            self.canvas_ids["d"].append(self.canvas.create_image(x * 110 + 350, 250, image = drawed[x].tk_image))
+            self.canvas_ids["d"].append(self.canvas.create_image(
+                x * 110 + 350, 250, image=drawed[x].tk_image))
 
     def splash(self):
         # Load image
         image = Image.open("jb_splash.png")
         cropped = image.crop((0, 0, 64, 64))
-        cropped = cropped.resize((cropped.height * 5, cropped.width * 5), resample=Image.NEAREST)
+        cropped = cropped.resize(
+            (cropped.height * 5, cropped.width * 5), resample=Image.NEAREST)
         tk_image = ImageTk.PhotoImage(cropped)
 
         # Show base image for 2 seconds
-        image_id = self.canvas.create_image(500, 250, image = tk_image)
+        image_id = self.canvas.create_image(500, 250, image=tk_image)
         lasttime = time()
 
         while time() - lasttime < 1:
@@ -244,13 +291,15 @@ class Graphics:
         x = 0
         count = 0
         while count < 50:
-            if (time() - lasttime) > (1/50):
+            if (time() - lasttime) > (1 / 50):
                 lasttime = time()
                 count += 1
                 x += 64
-                if x >= image.width: x = 0
+                if x >= image.width:
+                    x = 0
                 cropped = image.crop((x, 0, x + 64, 64))
-                cropped = cropped.resize((cropped.height * 5, cropped.width * 5), resample=Image.NEAREST)
+                cropped = cropped.resize(
+                    (cropped.height * 5, cropped.width * 5), resample=Image.NEAREST)
                 tk_image = ImageTk.PhotoImage(cropped)
                 self.canvas.itemconfig(image_id, image=tk_image)
             self.window.update()
@@ -265,6 +314,7 @@ class Graphics:
         self.canvas.delete(image_id)
         self.canvas.grid()
         self.window.update()
+
 
 if __name__ == "__main__":
     game_window = Graphics()
