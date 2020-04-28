@@ -4,32 +4,35 @@ from PIL import Image, ImageTk, ImageFont, ImageDraw
 import random as r
 from functools import reduce
 
+
 class Card:
     def __init__(self, number, family):
         self.number = number
         self.family = family
 
-    def generate_texture(self, rotation = 0, face = True):
+    def generate_texture(self, rotation=0, face=True):
         if face:
-            if self.family == 0: # Pique
+            if self.family == 0:  # Pique
                 self.base = Image.open("card_face_pique.png")
-            elif self.family == 1: # Trèfle
+            elif self.family == 1:  # Trèfle
                 self.base = Image.open("card_face_trefle.png")
-            elif self.family == 2: # Carreaux
+            elif self.family == 2:  # Carreaux
                 self.base = Image.open("card_face_carreaux.png")
-            elif self.family == 3: # Coeur
+            elif self.family == 3:  # Coeur
                 self.base = Image.open("card_face_coeur.png")
-            else: #Placeholder
+            else:  # Placeholder
                 self.base = Image.open("card_face_placeholder.png")
 
             self.font = ImageFont.truetype("LemonMilkbold.otf", 20)
 
             draw = ImageDraw.Draw(self.base)
-            draw.text((18,5), self.number_str(), fill=(0,0,0,255), font=self.font)
+            draw.text((18, 5), self.number_str(),
+                      fill=(0, 0, 0, 255), font=self.font)
         else:
             self.base = Image.open("card_back.png")
 
-        self.edited = self.base.resize((100, 140), resample=Image.NEAREST).rotate(rotation, expand=1)
+        self.edited = self.base.resize(
+            (100, 140), resample=Image.NEAREST).rotate(rotation, expand=1)
         self.tk_image = ImageTk.PhotoImage(self.edited)
 
     def full_cards_list():
@@ -55,36 +58,40 @@ class Card:
 
     def __str__(self):
         family = self.family
-        if   family == 0: # pique
+        if family == 0:  # pique
             family = "\u2660"
-        elif family == 1: # trèfle
+        elif family == 1:  # trèfle
             family = "\u2663"
-        elif family == 2: # carreaux
+        elif family == 2:  # carreaux
             family = "\u2666"
-        elif family == 3: # coeur
+        elif family == 3:  # coeur
             family = "\u2665"
 
         return self.number_str() + str(family)
+
 
 class Coin:
     def __init__(self):
         self.base = Image.open("coin.png")
         self.frame = 0
 
-    def generate_next_texture(self, moneyAmount = 0):
+    def generate_next_texture(self, moneyAmount=0):
         x = self.frame * 64
 
         if self.frame >= 46:
             x = 0
 
-        self.edited = self.base.crop((x, 0, x+64, 64)).resize((50, 50))
+        self.edited = self.base.crop((x, 0, x + 64, 64)).resize((50, 50))
         self.tk_image = ImageTk.PhotoImage(self.edited)
 
         self.frame = (self.frame + 1) % 150
 
+
 class Player:
     startingMoney = 100
-    names = ["Jackouille la fripouille", "___xXx__daRk_KikouLolDu92__xXx___", "Pigeon", "Coq", "Mouton", "Alban", "Maxence", "Megaman", "Yvette", "Verrue puante", "Asticot velu"]
+    names = ["Jackouille la fripouille", "___xXx__daRk_KikouLolDu92__xXx___", "Pigeon", "Coq",
+             "Mouton", "Alban", "Maxence", "Megaman", "Yvette", "Verrue puante", "Asticot velu"]
+
     def __init__(self):
         self.money = self.startingMoney
         self.name = self.randomName()
@@ -96,24 +103,25 @@ class Player:
                 " | Card 2 : " + str(self.hand[1]) +
                 " | Money : " + str(self.money))
 
-    def randomName(self): #string
+    def randomName(self):  # string
         r.shuffle(self.names)
         return self.names[0]
 
-    def getName(self): #string
+    def getName(self):  # string
         return self.name
 
     def newCard(self, card):
         self.hand.append(card)
 
-    def getMoney(self): #int
+    def getMoney(self):  # int
         return self.money
 
     def moneyChange(self, amount):
         self.money += amount
 
-    def getHand(self): #list of cards
+    def getHand(self):  # list of cards
         return self.hand
+
 
 class Partie:
     blinde = 0
@@ -122,7 +130,7 @@ class Partie:
     cardsInGame = []
     cardsLeft = []
 
-    def __init__(self, nbPlayers = 2, blinde = 10):
+    def __init__(self, nbPlayers=2, blinde=10):
         self.cardsLeft = Card.full_cards_list()
         r.shuffle(self.cardsLeft)
 
@@ -149,15 +157,14 @@ class Partie:
         self.blinde = blinde
 
         for i in range(0, nbPlayers):
-            self.players.append(Player()) #Generé dans cette classe
-
+            self.players.append(Player())  # Generé dans cette classe
 
     def __str__(self):
         ttr = "Players in the game : \n"
-        for player in self.players :
+        for player in self.players:
             ttr += (str(player) + "\n")
         ttr += "Cards in game : "
-        for card in self.cardsInGame :
+        for card in self.cardsInGame:
             ttr += (str(card) + " | ")
         return ttr
 
@@ -165,22 +172,22 @@ class Partie:
         return len(self.cardsInGame)
 
     def start(self):
-        self.draw(False, 2, 0) #Draw Player 1 Cards
-        self.draw(False, 2, 1) #Draw Player 2 Cards
-        self.draw(True, (3))     #Draw Game Cards
+        self.draw(False, 2, 0)  # Draw Player 1 Cards
+        self.draw(False, 2, 1)  # Draw Player 2 Cards
+        self.draw(True, (3))  # Draw Game Cards
 
     def bet(self, betAmount, playerIndex):
         self.players[playerIndex].moneyChange(-betAmount)
 
-    def draw(self, isForGame, amount = 1, playerIndex = 0):
+    def draw(self, isForGame, amount=1, playerIndex=0):
         if(len(self.cardsLeft) <= 0):
             return print("Error : The deck isn't supposed to be empty !")
-        else :
+        else:
             for i in range(0, amount):
-                if(isForGame == False) :
+                if(isForGame == False):
                     self.players[playerIndex].newCard(self.cardsLeft.pop(0))
-                        #print(self.players[playerIndex].hand[i].number, self.players[playerIndex].hand[i].family)
-                elif(isForGame == True) :
+                    #print(self.players[playerIndex].hand[i].number, self.players[playerIndex].hand[i].family)
+                elif(isForGame == True):
                     self.cardsInGame.append(self.cardsLeft[0])
                     self.cardsLeft.pop(0)
 
@@ -191,14 +198,14 @@ class Partie:
         elif(self.check(0)[0] < self.check(1)[0]):
             print("Victoire joueur 2 car meilleur type de main")
             return 2
-        else :
+        else:
             if(self.check(0)[1] > self.check(1)[1]):
                 print("Victoire joueur 1 car meilleur main contre le même type de main")
                 return 1
             elif(self.check(0)[1] < self.check(1)[1]):
                 print("Victoire joueur 2 car meilleur main contre le même type de main")
                 return 2
-            else :
+            else:
                 if(self.pScore(0) > self.pScore(1)):
                     print("Victoire joueur 1 car meilleur pScore")
                     return 1
@@ -217,7 +224,7 @@ class Partie:
             for i in range(2, 15):
                 j = 0
                 if c == i:
-                    j+=1
+                    j += 1
 
                 ps += 10**i * j
         return ps
@@ -230,39 +237,39 @@ class Partie:
         cardsToCheck = self.players[playerIndex].getHand() + self.cardsInGame
         playerIndex += 1
         cardsToCheck = self.sort(cardsToCheck)
-        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:#
+        if self.checkQuinteFlushRoyale(cardsToCheck)[0]:
             print("Quinte Flush Royale" + " " + str(playerIndex))
-            return (10,self.checkQuinteFlushRoyale(cardsToCheck)[1])
-        if self.checkQuinteFlush(cardsToCheck)[0]:#
+            return (10, self.checkQuinteFlushRoyale(cardsToCheck)[1])
+        if self.checkQuinteFlush(cardsToCheck)[0]:
             print("Quinte Flush" + " " + str(playerIndex))
-            return (9,self.checkQuinteFlush(cardsToCheck)[1])
-        elif self.checkCarre(cardsToCheck)[0]:#
+            return (9, self.checkQuinteFlush(cardsToCheck)[1])
+        elif self.checkCarre(cardsToCheck)[0]:
             print("Carre" + " " + str(playerIndex))
-            return (8,self.checkCarre(cardsToCheck)[1])
-        elif self.checkFull(cardsToCheck)[0]:#
+            return (8, self.checkCarre(cardsToCheck)[1])
+        elif self.checkFull(cardsToCheck)[0]:
             print("Full" + " " + str(playerIndex))
-            return (7,self.checkFull(cardsToCheck)[1])
-        elif self.checkCouleur(cardsToCheck)[0]:#
+            return (7, self.checkFull(cardsToCheck)[1])
+        elif self.checkCouleur(cardsToCheck)[0]:
             print("Couleur" + " " + str(playerIndex))
-            return (6,self.checkCouleur(cardsToCheck)[1])
-        elif self.checkSuite(cardsToCheck)[0]:#
+            return (6, self.checkCouleur(cardsToCheck)[1])
+        elif self.checkSuite(cardsToCheck)[0]:
             print("Suite" + " " + str(playerIndex))
-            return (5,self.checkSuite(cardsToCheck)[1])
-        elif self.checkBrelan(cardsToCheck)[0]:#
+            return (5, self.checkSuite(cardsToCheck)[1])
+        elif self.checkBrelan(cardsToCheck)[0]:
             print("Brelan" + " " + str(playerIndex))
-            return (4,self.checkBrelan(cardsToCheck)[1])
-        elif self.checkDoublePaire(cardsToCheck)[0]:#
+            return (4, self.checkBrelan(cardsToCheck)[1])
+        elif self.checkDoublePaire(cardsToCheck)[0]:
             print("Double Paire" + " " + str(playerIndex))
-            return (3,self.checkDoublePaire(cardsToCheck)[1])
-        elif self.checkPaire(cardsToCheck)[0]:#
+            return (3, self.checkDoublePaire(cardsToCheck)[1])
+        elif self.checkPaire(cardsToCheck)[0]:
             print("Paire" + " " + str(playerIndex))
-            return (2,self.checkPaire(cardsToCheck)[1])
+            return (2, self.checkPaire(cardsToCheck)[1])
         else:
             print("Carte la plus haute" + " " + str(playerIndex))
             highestN = 0
             for n in cardsToCheck:
                 highestN = max(n.number, highestN)
-            return (1, Card(highestN,1))#
+            return (1, Card(highestN, 1))
 
     def checkQuinteFlushRoyale(self, cards):
         if(self.checkQuinteFlush(cards)[0]):
@@ -274,20 +281,20 @@ class Partie:
             return (False, None)
 
     def checkQuinteFlush(self, cards):
-        #CouleurSetup
+        # CouleurSetup
         couleurs = [c.family for c in cards]
         mostFrequentFamily = self.mostFrequent(couleurs)
-        #print(mostFrequentFamily)
+        # print(mostFrequentFamily)
         count = 0
         for n in couleurs:
             if n == mostFrequentFamily and mostFrequentFamily < 4:
                 count += 1
         #print("Count :", count)
-        #SuiteSetup1
+        # SuiteSetup1
         p = 0
         last = []
         values = list(set([c.number for c in cards]))
-        #print(values)
+        # print(values)
         for element in values:
             if last != []:
                 for ele in last:
@@ -295,16 +302,16 @@ class Partie:
                         p += 1
             last.append(element)
         #print("p :", p)
-        #End
+        # End
         if count >= 5 and p >= 4:
-          flushCards = []
-          for card in cards:
-              if card.family == mostFrequentFamily:
-                  flushCards.append(card.number)
-          flushCards.sort()
-          return (True, flushCards[-1])
+            flushCards = []
+            for card in cards:
+                if card.family == mostFrequentFamily:
+                    flushCards.append(card.number)
+            flushCards.sort()
+            return (True, flushCards[-1])
         else:
-          return (False, None)
+            return (False, None)
 
     def checkCarre(self, cards):
         values = [c.number for c in cards]
@@ -325,7 +332,7 @@ class Partie:
         mostFrequentValue = self.mostFrequent(values)
         count = 0
 
-        for i in range(0, len(values)-1):
+        for i in range(0, len(values) - 1):
             if values[i] == mostFrequentValue:
                 count += 1
                 cardsToPop.append(i)
@@ -353,27 +360,27 @@ class Partie:
             if n == mostFrequentFamily and mostFrequentFamily < 4:
                 count += 1
         if count >= 5:
-          flushCards = []
-          for card in cards:
-              if card.family == mostFrequentFamily:
-                  flushCards.append(card.number)
-          flushCards.sort()
-          return (True, flushCards[-1])
+            flushCards = []
+            for card in cards:
+                if card.family == mostFrequentFamily:
+                    flushCards.append(card.number)
+            flushCards.sort()
+            return (True, flushCards[-1])
         else:
-          return (False, None)
+            return (False, None)
 
     def checkSuite(self, cards):
-        n=0
+        n = 0
         last = 0
         values = set([c.number for c in cards])
         values = list(values)
-        #print(values)
+        # print(values)
         isDone = False
         while isDone == False:
             isDone = True
             for val in values:
-##                if n >= 4 :
-##                    break
+                # if n >= 4 :
+                # break
                 if last != 0:
                     if val - last == 1:
                         n += 1
@@ -385,7 +392,7 @@ class Partie:
             if len(values) <= 1:
                 values.append(0)
             return (True, values[-1])
-        else :
+        else:
             return (False, None)
 
     def checkBrelan(self, cards):
@@ -407,7 +414,7 @@ class Partie:
         mostFrequentValue = self.mostFrequent(values)
         count = 0
 
-        for i in range(0, len(values)-1):
+        for i in range(0, len(values) - 1):
             if values[i] == mostFrequentValue:
                 count += 1
                 cardsToPop.append(i)
@@ -444,7 +451,7 @@ class Partie:
         num = List[0]
         for i in List:
             curr_frequency = List.count(i)
-            if(curr_frequency> counter):
+            if(curr_frequency > counter):
                 counter = curr_frequency
                 num = i
         return num
